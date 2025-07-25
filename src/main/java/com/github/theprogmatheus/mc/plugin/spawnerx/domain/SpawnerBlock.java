@@ -2,24 +2,36 @@ package com.github.theprogmatheus.mc.plugin.spawnerx.domain;
 
 import com.github.theprogmatheus.mc.plugin.spawnerx.util.LinkedObject;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
+@Setter
 public class SpawnerBlock extends LinkedObject<BlockLocationKey> {
 
     private final transient SpawnerBlockConfig config;
+    private transient List<MobEntity> spawnedMobs;
 
     public SpawnerBlock(@NotNull Block block, @NotNull SpawnerBlockConfig config) {
         super(BlockLocationKey.fromBukkitLocation(block.getLocation()));
         this.config = config;
+        this.spawnedMobs = new ArrayList<>();
     }
 
     public Block getBlock() {
         return getOriginal().getBlock();
+    }
+
+    public List<MobEntity> getSpawnedMobs() {
+        this.spawnedMobs.removeIf(MobEntity::isBroken); //clean broken mobs (dead, or non exists)
+        return this.spawnedMobs;
     }
 
     @Override
