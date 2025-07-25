@@ -20,6 +20,6 @@ public class SpawnerBlockBreakListener implements Listener {
             return;
 
         LinkedObject.getLink(SpawnerBlock.class, BlockLocationKey.fromBukkitLocation(block.getLocation()))
-                .ifPresent(LinkedObject::unlink);
+                .ifPresent(spawnerBlock -> spawnerBlock.handleBlockBreak(event));
     }
 }
