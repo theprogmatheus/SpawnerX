@@ -25,6 +25,11 @@ public class SpawnerBlock extends LinkedObject<BlockLocationKey> {
         super.unlink();
     }
 
+    @Override
+    public boolean isBroken() {
+        return !isValidBukkitSpawnerBlock(getBlock());
+    }
+
     public static boolean isValidBukkitSpawnerBlock(@NotNull Block block) {
         return block.getState() instanceof CreatureSpawner;
     }
