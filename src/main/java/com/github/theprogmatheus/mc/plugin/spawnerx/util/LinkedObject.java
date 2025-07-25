@@ -4,6 +4,7 @@ import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Getter
 public abstract class LinkedObject<O> {
@@ -17,11 +18,11 @@ public abstract class LinkedObject<O> {
         this.link();
     }
 
-    public static <T extends LinkedObject<O>, O> T getLink(Class<? extends T> linkerClass, O original) {
+    public static <T extends LinkedObject<O>, O> Optional<T> getLink(Class<? extends T> linkerClass, O original) {
         var linkerMap = linkers.get(linkerClass);
         if (linkerMap == null)
-            throw new RuntimeException("There is no registered links for this class [%s], please register a link before retrieving.".formatted(linkerClass.getName()));
-        return (T) linkerMap.get(original);
+            return Optional.empty();
+        return Optional.ofNullable((T) linkerMap.get(original));
     }
 
     public void link() {
