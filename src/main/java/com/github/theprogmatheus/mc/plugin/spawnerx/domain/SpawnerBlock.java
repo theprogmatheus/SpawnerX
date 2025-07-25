@@ -1,14 +1,19 @@
 package com.github.theprogmatheus.mc.plugin.spawnerx.domain;
 
 import com.github.theprogmatheus.mc.plugin.spawnerx.util.LinkedObject;
+import lombok.Getter;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.jetbrains.annotations.NotNull;
 
+@Getter
 public class SpawnerBlock extends LinkedObject<BlockLocationKey> {
 
-    public SpawnerBlock(@NotNull Block block) {
+    private final transient SpawnerBlockConfig config;
+
+    public SpawnerBlock(@NotNull Block block, @NotNull SpawnerBlockConfig config) {
         super(BlockLocationKey.fromBukkitLocation(block.getLocation()));
+        this.config = config;
     }
 
     public Block getBlock() {
@@ -18,6 +23,9 @@ public class SpawnerBlock extends LinkedObject<BlockLocationKey> {
     @Override
     public void link() {
         super.link();
+
+        if (getBlock().getState() instanceof CreatureSpawner creatureSpawner)
+            this.config.updateCreatureSpawner(creatureSpawner);
     }
 
     @Override

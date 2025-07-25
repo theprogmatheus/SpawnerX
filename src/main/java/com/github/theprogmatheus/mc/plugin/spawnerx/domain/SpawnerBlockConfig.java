@@ -1,6 +1,10 @@
 package com.github.theprogmatheus.mc.plugin.spawnerx.domain;
 
-import lombok.Data;
+import com.github.theprogmatheus.mc.plugin.spawnerx.util.LinkedObject;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.CreatureSpawner;
@@ -10,10 +14,14 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.List;
 
-@Data
-public class SpawnerBlockConfig {
+@Getter
+@Setter
+@ToString
+@EqualsAndHashCode(callSuper = false)
+public class SpawnerBlockConfig extends LinkedObject<String> {
 
     private final transient Plugin plugin;
     private final transient NamespacedKey namespacedKey;
@@ -31,6 +39,7 @@ public class SpawnerBlockConfig {
     private int maxNearbyEntities = 16;
 
     public SpawnerBlockConfig(@NotNull Plugin plugin, @NotNull String id, @NotNull EntityType entityType) {
+        super(id);
         this.plugin = plugin;
         this.namespacedKey = new NamespacedKey(plugin, "spawner_block_config");
         this.id = id;
@@ -66,6 +75,11 @@ public class SpawnerBlockConfig {
         creatureSpawner.setMaxNearbyEntities(this.maxNearbyEntities);
 
         return creatureSpawner.update();
+    }
+
+    public static void loadDefaults(@NotNull Plugin plugin) {
+        Arrays.stream(EntityType.values()).forEach(entityType ->
+                new SpawnerBlockConfig(plugin, entityType.name(), entityType).link());
     }
 
 }
