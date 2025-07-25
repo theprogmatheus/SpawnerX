@@ -3,47 +3,42 @@ package com.github.theprogmatheus.mc.plugin.spawnerx.domain;
 import com.github.theprogmatheus.mc.plugin.spawnerx.util.LinkedObject;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Getter
 public class MobEntity extends LinkedObject<UUID> {
 
-    private static final String DISPLAY_STACKED_AMOUNT_FORMAT = "§fx%s";
+    private static final String stackedAmountDisplayFormat = "§fx%s";
+    private static final NamespacedKey mobEntityRefNamespacedKey = new NamespacedKey("spawnerx", "mob_entity_ref");
 
+    private final LivingEntity entity;
     private int stackedAmount;
 
-    MobEntity(@NotNull Entity entity) {
+    MobEntity(@NotNull LivingEntity entity) {
         super(entity.getUniqueId());
+        this.entity = entity;
         this.stackedAmount = 1;
     }
 
-    public MobEntity setup(Entity entity) {
+    public MobEntity setup() {
         this.link();
 
         entity.setCustomNameVisible(true);
-        entity.setCustomName(DISPLAY_STACKED_AMOUNT_FORMAT.formatted(this.stackedAmount));
-        if (entity instanceof LivingEntity livingEntity)
-            livingEntity.setAI(false);
+        //entity.setAI(false);
 
+        updateDisplayStackedAmount();
         return this;
     }
 
-
     public void updateDisplayStackedAmount() {
-        var entity = getEntity();
-        if (entity != null) {
-            entity.setCustomNameVisible(true);
-            entity.setCustomName(DISPLAY_STACKED_AMOUNT_FORMAT.formatted(this.stackedAmount));
-        }
-    }
-
-    public Entity getEntity() {
-        return Bukkit.getEntity(getOriginal());
+        entity.setCustomName(stackedAmountDisplayFormat.formatted(this.stackedAmount));
     }
 
     @Override
@@ -56,16 +51,51 @@ public class MobEntity extends LinkedObject<UUID> {
         this.updateDisplayStackedAmount();
     }
 
-    public static boolean handleMobDeath(LivingEntity killer, LivingEntity entity) {
-
-        var maxHealthAttr = entity.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-        if (maxHealthAttr != null)
-            entity.setHealth(maxHealthAttr.getValue());
-
-        return true;
+    public void unstack() {
+        unstack(1);
     }
 
-    public static MobEntity newMobEntity(@NotNull Entity entity) {
-        return new MobEntity(entity).setup(entity);
+    public void unstack(int amount) {
+        this.stackedAmount -= amount;
+        if (this.stackedAmount > 0)
+            this.updateDisplayStackedAmount();
+    }
+
+    private LivingEntity spawnFakeEntity() {
+        var loc = entity.getLocation();
+        var fakeEntity = (LivingEntity) loc.getWorld().spawnEntity(loc, entity.getType());
+        fakeEntity.getPersistentDataContainer()
+                .set(mobEntityRefNamespacedKey, PersistentDataType.STRING, getOriginal().toString());
+        return fakeEntity;
+    }
+
+    public void simulateDeath(LivingEntity killer, int amount) {
+        this.unstack(amount);
+        if (this.stackedAmount > 0) {
+            this.entity.setHealth(this.entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+
+            var fakeEntity = spawnFakeEntity();
+            fakeEntity.damage(fakeEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue(), killer);
+        }
+    }
+
+    public static Optional<MobEntity> fromEntity(@NotNull LivingEntity entity) {
+        return getLink(MobEntity.class, entity.getUniqueId());
+    }
+
+    public static Optional<MobEntity> fromFakeEntity(@NotNull LivingEntity fakeEntity) {
+        var uuidString = fakeEntity.getPersistentDataContainer().get(mobEntityRefNamespacedKey, PersistentDataType.STRING);
+        if (uuidString == null || uuidString.isBlank())
+            return Optional.empty();
+
+        try {
+            return getLink(MobEntity.class, UUID.fromString(uuidString));
+        } catch (Exception ignored) {
+            return Optional.empty();
+        }
+    }
+
+    public static MobEntity newMobEntity(@NotNull LivingEntity entity) {
+        return new MobEntity(entity).setup();
     }
 }

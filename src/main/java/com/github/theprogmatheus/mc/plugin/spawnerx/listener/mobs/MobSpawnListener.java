@@ -3,6 +3,7 @@ package com.github.theprogmatheus.mc.plugin.spawnerx.listener.mobs;
 import com.github.theprogmatheus.mc.plugin.spawnerx.domain.BlockLocationKey;
 import com.github.theprogmatheus.mc.plugin.spawnerx.domain.MobEntity;
 import com.github.theprogmatheus.mc.plugin.spawnerx.domain.SpawnerBlock;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -18,6 +19,9 @@ public class MobSpawnListener implements Listener {
         if (event.isCancelled())
             return;
 
+        if (!(event.getEntity() instanceof LivingEntity entity))
+            return;
+
         var spawnerLink = getLink(SpawnerBlock.class, BlockLocationKey.fromBukkitLocation(event.getSpawner().getLocation()));
         if (spawnerLink.isEmpty())
             return;
@@ -26,7 +30,7 @@ public class MobSpawnListener implements Listener {
         var spawnedMobs = spawnerBlock.getSpawnedMobs();
 
         if (spawnedMobs.isEmpty())
-            spawnedMobs.add(MobEntity.newMobEntity(event.getEntity()));
+            spawnedMobs.add(MobEntity.newMobEntity(entity));
         else {
             event.setCancelled(true);
             spawnedMobs.get(0).stack();
