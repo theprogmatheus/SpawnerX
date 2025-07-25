@@ -38,6 +38,10 @@ public abstract class LinkedObject<O> {
         return linkerMap().containsKey(this.original);
     }
 
+    public boolean isBroken() {
+        return false;
+    }
+
     private Map<Object, LinkedObject<?>> linkerMap() {
         return linkers.computeIfAbsent(getClass(), key -> new HashMap<>());
     }
