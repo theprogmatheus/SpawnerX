@@ -1,0 +1,9 @@
+main: ${main}
+name: ${name}
+version: ${version}
+api-version: ${apiVersion}
+authors:
+  - ${authors}
+website: ${website}
+description: ${description}
+libraries: ${libraries}
