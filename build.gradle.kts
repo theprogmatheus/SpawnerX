@@ -32,11 +32,16 @@ repositories {
         url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
     }
     maven { url = uri("https://repo.papermc.io/repository/maven-public/") }
+    maven { url = uri("https://jitpack.io") }
 }
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20-R0.1-SNAPSHOT")
     compileOnly("org.projectlombok:lombok:1.18.38")
+
+    implementation("com.github.theprogmatheus:JGR-UChecker:1.0.0") {
+        isTransitive = false;
+    }
 
     annotationProcessor("org.projectlombok:lombok:1.18.38")
 
@@ -81,6 +86,8 @@ tasks {
     shadowJar {
         dependsOn(test)
         mustRunAfter(test)
+
+        relocate("com.github.theprogmatheus.util", "${pluginPackage}.util")
     }
 
     test {

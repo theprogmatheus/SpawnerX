@@ -29,6 +29,7 @@ public class MainService extends PluginService {
         addService(CommandService.class, 5, 0);
         addService(ListenerService.class);
         addService(APIService.class);
+        addService(UpdateCheckerService.class, -5, 0);
     }
 
     @Override
