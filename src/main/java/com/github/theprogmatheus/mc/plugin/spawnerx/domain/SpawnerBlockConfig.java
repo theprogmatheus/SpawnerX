@@ -39,10 +39,10 @@ public class SpawnerBlockConfig extends LinkedObject<String> {
     private int maxNearbyEntities = 16;
 
     public SpawnerBlockConfig(@NotNull Plugin plugin, @NotNull String id, @NotNull EntityType entityType) {
-        super(id);
+        super(id.toLowerCase());
         this.plugin = plugin;
-        this.namespacedKey = new NamespacedKey(plugin, "spawner_block_config");
-        this.id = id;
+        this.namespacedKey = getNamespacedKey(plugin);
+        this.id = id.toLowerCase();
         this.entityType = entityType;
         this.entityName = entityType.name();
     }
@@ -80,6 +80,17 @@ public class SpawnerBlockConfig extends LinkedObject<String> {
     public static void loadDefaults(@NotNull Plugin plugin) {
         Arrays.stream(EntityType.values()).forEach(entityType ->
                 new SpawnerBlockConfig(plugin, entityType.name(), entityType).link());
+    }
+
+    public static String getSpawnerBlockConfigId(@NotNull Plugin plugin, @NotNull ItemStack itemStack) {
+        var itemMeta = itemStack.getItemMeta();
+        if (itemMeta == null)
+            return null;
+        return itemMeta.getPersistentDataContainer().get(getNamespacedKey(plugin), PersistentDataType.STRING);
+    }
+
+    public static NamespacedKey getNamespacedKey(@NotNull Plugin plugin) {
+        return new NamespacedKey(plugin, "spawner_block_config");
     }
 
 }

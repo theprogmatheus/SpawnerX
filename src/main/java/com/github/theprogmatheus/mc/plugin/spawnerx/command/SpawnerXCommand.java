@@ -19,7 +19,7 @@ import javax.inject.Singleton;
 public class SpawnerXCommand extends AbstractCommand {
 
     @Subcommand("get")
-    void getSpawner(Player player, @Name("spawnerConfig") SpawnerBlockConfig spawnerConfig, @Name("amount") int amount) {
+    void getSpawner(Player player, @Name("spawner") SpawnerBlockConfig spawnerConfig, @Name("amount") int amount) {
         if (spawnerConfig == null) {
             player.sendMessage("§cConfig não encontrada.");
         } else {
@@ -32,6 +32,6 @@ public class SpawnerXCommand extends AbstractCommand {
     public void resolveContexts(CommandContexts<BukkitCommandExecutionContext> commandContexts) {
 
         commandContexts.registerContext(SpawnerBlockConfig.class, context ->
-                LinkedObject.getLink(SpawnerBlockConfig.class, context.popFirstArg()).orElse(null));
+                LinkedObject.getLink(SpawnerBlockConfig.class, context.popFirstArg().toLowerCase()).orElse(null));
     }
 }
