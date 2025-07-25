@@ -17,7 +17,7 @@ public class SpawnerBlockPlaceListener implements Listener {
         if (!SpawnerBlock.isValidBukkitSpawnerBlock(block))
             return;
 
-        new SpawnerBlock(block).setup();
+        new SpawnerBlock(block).link();
     }
 
 

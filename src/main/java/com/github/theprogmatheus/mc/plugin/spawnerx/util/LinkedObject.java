@@ -15,7 +15,6 @@ public abstract class LinkedObject<O> {
 
     public LinkedObject(O original) {
         this.original = original;
-        this.link();
     }
 
     public static <T extends LinkedObject<O>, O> Optional<T> getLink(Class<? extends T> linkerClass, O original) {

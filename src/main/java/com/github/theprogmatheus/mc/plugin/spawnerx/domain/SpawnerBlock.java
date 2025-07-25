@@ -15,8 +15,14 @@ public class SpawnerBlock extends LinkedObject<BlockLocationKey> {
         return getOriginal().getBlock();
     }
 
-    public void setup() {
+    @Override
+    public void link() {
+        super.link();
+    }
 
+    @Override
+    public void unlink() {
+        super.unlink();
     }
 
     public static boolean isValidBukkitSpawnerBlock(@NotNull Block block) {
