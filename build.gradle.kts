@@ -3,17 +3,17 @@ plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
-group = "com.github.theprogmatheus.mc.plugin.spigot"
+group = "com.github.theprogmatheus.mc.plugin"
 version = "1.0-SNAPSHOT"
 
-val pluginPackage = "${group}.plugintemplate"
-val pluginMain = "${pluginPackage}.PluginTemplate"
+val pluginPackage = "${group}.spawnerx"
+val pluginMain = "${pluginPackage}.SpawnerX"
 val pluginName = project.name
 val pluginVersion = project.version
 val pluginAuthors = listOf("Sr_Edition", "TheProgMatheus")
 val apiVersion = "1.20"
-val pluginWebsite = "https://github.com/theprogmatheus/PluginTemplate"
-val pluginDescription = "Um template base para desenvolvimento de plugins"
+val pluginWebsite = "https://github.com/theprogmatheus/SpawnerX"
+val pluginDescription = "A spawner plugin for your paper server"
 val pluginDependencies = listOf(
     "javax.inject:javax.inject:1",
     "net.gmcbm.dependencies:acf-paper:0.5.2",

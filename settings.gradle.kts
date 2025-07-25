@@ -1,2 +1,1 @@
-rootProject.name = "PluginTemplate"
-
+rootProject.name = "SpawnerX"
