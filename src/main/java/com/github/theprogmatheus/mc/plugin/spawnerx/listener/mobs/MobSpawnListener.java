@@ -26,7 +26,7 @@ public class MobSpawnListener implements Listener {
         var spawnedMobs = spawnerBlock.getSpawnedMobs();
 
         if (spawnedMobs.isEmpty())
-            spawnedMobs.add(new MobEntity(event.getEntity()).setup());
+            spawnedMobs.add(MobEntity.newMobEntity(event.getEntity()));
         else {
             event.setCancelled(true);
             spawnedMobs.get(0).stack();
