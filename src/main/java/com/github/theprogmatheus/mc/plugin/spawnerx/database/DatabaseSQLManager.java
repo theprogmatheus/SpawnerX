@@ -1,6 +1,6 @@
-package com.github.theprogmatheus.mc.plugin.spawnerx.database.sql;
+package com.github.theprogmatheus.mc.plugin.spawnerx.database;
 
-import com.github.theprogmatheus.mc.plugin.spawnerx.database.sql.repository.PlayerDataRepository;
+import com.github.theprogmatheus.mc.plugin.spawnerx.database.repository.SpawnerBlockRepository;
 import com.github.theprogmatheus.mc.plugin.spawnerx.lib.Injector;
 import com.j256.ormlite.jdbc.DataSourceConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
@@ -26,7 +26,7 @@ public class DatabaseSQLManager {
      * Register your repositories here
      */
     private void registerRepositories() {
-        registerRepository(PlayerDataRepository.class);
+        registerRepository(SpawnerBlockRepository.class);
     }
 
 
