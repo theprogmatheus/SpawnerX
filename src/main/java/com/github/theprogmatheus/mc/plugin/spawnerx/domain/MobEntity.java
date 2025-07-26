@@ -18,7 +18,7 @@ public class MobEntity extends LinkedObject<UUID> {
     private static final String stackedAmountDisplayFormat = "§fx%s";
     private static final NamespacedKey mobEntityRefNamespacedKey = new NamespacedKey("spawnerx", "mob_entity_ref");
 
-    private final LivingEntity entity;
+    private final transient LivingEntity entity;
     private int stackedAmount;
 
     MobEntity(@NotNull LivingEntity entity) {
