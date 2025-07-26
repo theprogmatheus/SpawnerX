@@ -78,8 +78,9 @@ public class SpawnerBlockConfig extends LinkedObject<String> {
     }
 
     public static void loadDefaults(@NotNull Plugin plugin) {
-        Arrays.stream(EntityType.values()).forEach(entityType ->
-                new SpawnerBlockConfig(plugin, entityType.name(), entityType).link());
+        Arrays.stream(EntityType.values())
+                .filter(EntityType::isAlive)
+                .forEach(entityType -> new SpawnerBlockConfig(plugin, entityType.name(), entityType).link());
     }
 
     public static String getSpawnerBlockConfigId(@NotNull Plugin plugin, @NotNull ItemStack itemStack) {

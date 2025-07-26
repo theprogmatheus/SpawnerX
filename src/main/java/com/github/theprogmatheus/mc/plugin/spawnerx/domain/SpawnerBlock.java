@@ -16,11 +16,18 @@ import java.util.List;
 @Setter
 public class SpawnerBlock extends LinkedObject<BlockLocationKey> {
 
+    private transient Long dbId;
     private final transient SpawnerBlockConfig config;
     private transient List<MobEntity> spawnedMobs;
 
     public SpawnerBlock(@NotNull Block block, @NotNull SpawnerBlockConfig config) {
         super(BlockLocationKey.fromBukkitLocation(block.getLocation()));
+        this.config = config;
+        this.spawnedMobs = new ArrayList<>();
+    }
+
+    public SpawnerBlock(@NotNull BlockLocationKey blockLocationKey, @NotNull SpawnerBlockConfig config) {
+        super(blockLocationKey);
         this.config = config;
         this.spawnedMobs = new ArrayList<>();
     }

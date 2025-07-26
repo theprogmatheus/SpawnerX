@@ -30,7 +30,7 @@ public class MainService extends PluginService {
         addService(ListenerService.class);
         addService(APIService.class);
         addService(UpdateCheckerService.class);
-        addService(SpawnerXService.class);
+        addService(SpawnerXService.class, -10, 10);
     }
 
     @Override
