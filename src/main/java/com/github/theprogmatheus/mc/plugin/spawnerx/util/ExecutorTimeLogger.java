@@ -13,7 +13,7 @@ public class ExecutorTimeLogger {
         } finally {
             long end = System.nanoTime();
             long durationMs = (end - start) / 1_000_000;
-            logger.log(Level.INFO, " [{0}] executed in {1} ms", new Object[]{taskName, durationMs});
+            logger.log(Level.INFO, "[{0}] executed in {1} ms", new Object[]{taskName, durationMs});
         }
     }
 
@@ -24,7 +24,7 @@ public class ExecutorTimeLogger {
         } finally {
             long end = System.nanoTime();
             long durationMs = (end - start) / 1_000_000;
-            logger.log(Level.INFO, " [{0}] executed in {1} ms", new Object[]{taskName, durationMs});
+            logger.log(Level.INFO, "[{0}] executed in {1} ms", new Object[]{taskName, durationMs});
         }
     }
 }

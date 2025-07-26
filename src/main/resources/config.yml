@@ -4,6 +4,6 @@ config-version: 1.0
 # Define de messages lang
 lang:
   # Define the default lang
-  default: "en_us"
+  default: "pt_br"
   #Define if you want to use individual lang per player settings
   individual: true

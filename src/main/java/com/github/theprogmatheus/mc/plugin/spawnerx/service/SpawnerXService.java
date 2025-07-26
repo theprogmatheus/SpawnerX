@@ -27,8 +27,8 @@ public class SpawnerXService extends PluginService {
     private final transient Injector injector;
     private final transient SpawnerX plugin;
     private final transient Logger log;
-    private final transient SpawnerBlockRepository spawnerBlockRepository;
 
+    private SpawnerBlockRepository spawnerBlockRepository;
     private SpawnerBlockMapper spawnerBlockMapper;
     private BukkitTask autoSaveAndPurgeTask;
 
@@ -36,10 +36,11 @@ public class SpawnerXService extends PluginService {
     public void startup() {
         SpawnerBlockConfig.loadDefaults(this.plugin);
 
+        this.spawnerBlockRepository = this.injector.getInstance(SpawnerBlockRepository.class);
         this.spawnerBlockMapper = this.injector.getInstance(SpawnerBlockMapper.class);
-        this.autoSaveAndPurgeTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this.plugin, this::executeAndLogTimeSaveAndPurge, 20 * 300, 20 * 300);
+        this.autoSaveAndPurgeTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this.plugin, this::saveSpawnerBlocks, 20 * 300, 20 * 300);
 
-        this.executeAndLogTimeLoadSpawners();
+        loadSpawnerBlocks();
     }
 
 
@@ -47,73 +48,64 @@ public class SpawnerXService extends PluginService {
     public void shutdown() {
         if (this.autoSaveAndPurgeTask != null)
             this.autoSaveAndPurgeTask.cancel();
-        executeAndLogTimeSaveAndPurge();
+
+        saveSpawnerBlocks();
+        purgeSpawnerBlocks();
     }
 
-    public synchronized void executeAndLogTimeLoadSpawners() {
-        ExecutorTimeLogger.executeAndLogTime(this.log, "loadSpawners", () -> {
+    public void loadSpawnerBlocks() {
+        ExecutorTimeLogger.executeAndLogTime(this.log, "Load SpawnerBlocks", () -> {
             try {
-                loadSpawnerBlocks();
+                this.spawnerBlockRepository
+                        .queryForAll()
+                        .stream()
+                        .map(spawnerBlockMapper::mapTo)
+                        .filter(SpawnerBlock::isOk)
+                        .forEach(SpawnerBlock::link);
             } catch (SQLException e) {
                 log.log(Level.SEVERE, "It was not possible to load the database spawners.", e);
             }
         });
     }
 
-    public synchronized void executeAndLogTimeSaveAndPurge() {
-        ExecutorTimeLogger.executeAndLogTime(this.log, "saveSpawnerBlocks", () -> {
+    public synchronized void saveSpawnerBlocks() {
+        ExecutorTimeLogger.executeAndLogTime(this.log, "Save SpawnerBlocks", () -> {
             try {
-                saveSpawnerBlocks();
+                var link = LinkedObject.getLinkerMap(SpawnerBlock.class);
+                if (link.isPresent()) {
+                    var toSave = link.get()
+                            .values()
+                            .stream()
+                            .map(spawnerBlockMapper::mapFrom)
+                            .toList();
+
+                    this.spawnerBlockRepository.callBatchTasks(() -> {
+                        for (SpawnerBlockEntity entity : toSave)
+                            this.spawnerBlockRepository.createOrUpdate(entity);
+                        return null;
+                    });
+                }
             } catch (Exception e) {
                 log.log(Level.SEVERE, "An error occurred when trying to save the spawners in the database.", e);
             }
         });
+    }
 
-        ExecutorTimeLogger.executeAndLogTime(this.log, "purge", () -> {
+    public void purgeSpawnerBlocks() {
+        ExecutorTimeLogger.executeAndLogTime(this.log, "Purge SpawnerBlocks", () -> {
             try {
-                purge();
+                var toDelete = this.spawnerBlockRepository
+                        .queryForAll()
+                        .stream()
+                        .map(spawnerBlockMapper::mapTo)
+                        .filter(SpawnerBlock::isBroken)
+                        .map(spawnerBlockMapper::mapFrom)
+                        .toList();
+                this.spawnerBlockRepository.delete(toDelete);
             } catch (Exception e) {
                 log.log(Level.SEVERE, "An error occurred when trying to clean the database of broken spawners", e);
             }
         });
-    }
-
-    public void loadSpawnerBlocks() throws SQLException {
-        this.spawnerBlockRepository
-                .queryForAll()
-                .stream()
-                .map(spawnerBlockMapper::mapTo)
-                .filter(SpawnerBlock::isOk)
-                .forEach(SpawnerBlock::link);
-    }
-
-    public void saveSpawnerBlocks() throws Exception {
-        var link = LinkedObject.getLinkerMap(SpawnerBlock.class);
-        if (link.isPresent()) {
-            var toSave = link.get()
-                    .values()
-                    .stream()
-                    .filter(SpawnerBlock::isOk)
-                    .map(spawnerBlockMapper::mapFrom)
-                    .toList();
-
-            this.spawnerBlockRepository.callBatchTasks(() -> {
-                for (SpawnerBlockEntity entity : toSave)
-                    this.spawnerBlockRepository.createOrUpdate(entity);
-                return null;
-            });
-        }
-    }
-
-    public void purge() throws SQLException {
-        var toDelete = this.spawnerBlockRepository
-                .queryForAll()
-                .stream()
-                .map(spawnerBlockMapper::mapTo)
-                .filter(SpawnerBlock::isBroken)
-                .map(spawnerBlockMapper::mapFrom)
-                .toList();
-        this.spawnerBlockRepository.delete(toDelete);
     }
 
 }

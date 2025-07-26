@@ -10,6 +10,7 @@ import com.j256.ormlite.support.DatabaseConnection;
 import com.j256.ormlite.support.DatabaseResults;
 import com.j256.ormlite.table.ObjectFactory;
 import com.j256.ormlite.table.TableInfo;
+import com.j256.ormlite.table.TableUtils;
 import lombok.Getter;
 
 import javax.inject.Inject;
@@ -31,6 +32,7 @@ public class SpawnerBlockRepository implements Dao<SpawnerBlockEntity, Long> {
     @Inject
     public SpawnerBlockRepository(ConnectionSource connectionSource) throws SQLException {
         this.spawnerBlockEntities = DaoManager.createDao(connectionSource, SpawnerBlockEntity.class);
+        TableUtils.createTableIfNotExists(connectionSource, SpawnerBlockEntity.class);
     }
 
     @Override

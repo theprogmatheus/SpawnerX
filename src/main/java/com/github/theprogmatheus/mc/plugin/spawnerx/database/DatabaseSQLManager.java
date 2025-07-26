@@ -1,7 +1,5 @@
 package com.github.theprogmatheus.mc.plugin.spawnerx.database;
 
-import com.github.theprogmatheus.mc.plugin.spawnerx.database.repository.MobEntityRepository;
-import com.github.theprogmatheus.mc.plugin.spawnerx.database.repository.SpawnerBlockRepository;
 import com.github.theprogmatheus.mc.plugin.spawnerx.lib.Injector;
 import com.j256.ormlite.jdbc.DataSourceConnectionSource;
 import com.j256.ormlite.support.ConnectionSource;
@@ -22,31 +20,15 @@ public class DatabaseSQLManager {
     private HikariDataSource dataSource;
     private ConnectionSource connectionSource;
 
-
-    /**
-     * Register your repositories here
-     */
-    private void registerRepositories() {
-        registerRepository(SpawnerBlockRepository.class);
-        registerRepository(MobEntityRepository.class);
-    }
-
-
     public void openConnection() throws SQLException {
         this.dataSource = new HikariDataSource(this.databaseConfig);
         this.connectionSource = new DataSourceConnectionSource(this.dataSource, this.databaseConfig.getJdbcUrl());
         this.injector.registerSingleton(ConnectionSource.class, this.connectionSource);
-
-        registerRepositories();
     }
 
     public void closeConnection() throws Exception {
         this.connectionSource.close();
         this.dataSource.close();
-    }
-
-    private void registerRepository(Class<?> repositoryClass) {
-        this.injector.getInstance(repositoryClass);
     }
 
 }
