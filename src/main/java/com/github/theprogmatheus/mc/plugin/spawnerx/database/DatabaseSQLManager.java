@@ -1,5 +1,6 @@
 package com.github.theprogmatheus.mc.plugin.spawnerx.database;
 
+import com.github.theprogmatheus.mc.plugin.spawnerx.database.repository.MobEntityRepository;
 import com.github.theprogmatheus.mc.plugin.spawnerx.database.repository.SpawnerBlockRepository;
 import com.github.theprogmatheus.mc.plugin.spawnerx.lib.Injector;
 import com.j256.ormlite.jdbc.DataSourceConnectionSource;
@@ -27,6 +28,7 @@ public class DatabaseSQLManager {
      */
     private void registerRepositories() {
         registerRepository(SpawnerBlockRepository.class);
+        registerRepository(MobEntityRepository.class);
     }
 
 
