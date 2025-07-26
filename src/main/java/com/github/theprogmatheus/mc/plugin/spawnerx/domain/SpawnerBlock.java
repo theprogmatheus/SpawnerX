@@ -50,8 +50,13 @@ public class SpawnerBlock extends LinkedObject<BlockLocationKey> {
     }
 
     @Override
+    public boolean isOk() {
+        return isValidBukkitSpawnerBlock(getBlock());
+    }
+
+    @Override
     public boolean isBroken() {
-        return !isValidBukkitSpawnerBlock(getBlock());
+        return !isOk();
     }
 
     public void handleBlockBreak(BlockBreakEvent event) {

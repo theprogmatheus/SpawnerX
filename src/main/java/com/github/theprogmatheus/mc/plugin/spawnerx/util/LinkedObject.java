@@ -24,6 +24,10 @@ public abstract class LinkedObject<O> {
         return Optional.ofNullable((T) linkerMap.get(original));
     }
 
+    public static <T extends LinkedObject<?>> Optional<Map<Object, T>> getLinkerMap(Class<? extends T> linkerClass) {
+        return Optional.ofNullable((Map<Object, T>) linkers.get(linkerClass));
+    }
+
     public void link() {
         if (hasLinked())
             throw new RuntimeException("A link to this object already exists, use getLink() to retrieve the link for this object.");
@@ -40,6 +44,10 @@ public abstract class LinkedObject<O> {
 
     public boolean isBroken() {
         return false;
+    }
+
+    public boolean isOk() {
+        return !isBroken();
     }
 
     private Map<Object, LinkedObject<?>> linkerMap() {

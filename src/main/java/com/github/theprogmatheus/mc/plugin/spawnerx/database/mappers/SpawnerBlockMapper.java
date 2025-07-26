@@ -11,7 +11,9 @@ import org.bukkit.entity.EntityType;
 import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
+@Singleton
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class SpawnerBlockMapper implements ObjectMapper<SpawnerBlockEntity, SpawnerBlock> {
 
