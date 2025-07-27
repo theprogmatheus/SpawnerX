@@ -1,18 +1,20 @@
 package com.github.theprogmatheus.mc.plugin.spawnerx.domain;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class BlockLocationKey {
 
-    private final String world;
-    private final int x, y, z;
+    private String world;
+    private int x, y, z;
 
 
     public Block getBlock() {

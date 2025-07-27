@@ -25,12 +25,12 @@ public class MainService extends PluginService {
     public void setupServices() {
         addService(ConfigurationService.class, 10, 0);
         addService(MessageService.class, 9, 0);
-        addService(DatabaseSQLService.class, 8, -8); // or DatabaseMongoService.class
+        addService(DatabaseSQLService.class, 8, -8);
         addService(CommandService.class, 5, 0);
         addService(ListenerService.class);
         addService(APIService.class);
         addService(UpdateCheckerService.class);
-        addService(SpawnerXService.class);
+        addService(SpawnerXService.class, -10, 10);
     }
 
     @Override

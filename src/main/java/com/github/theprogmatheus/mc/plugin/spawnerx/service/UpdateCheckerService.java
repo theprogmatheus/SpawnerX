@@ -7,8 +7,10 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.logging.Logger;
 
+@Singleton
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class UpdateCheckerService extends PluginService {
 

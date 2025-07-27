@@ -1,6 +1,7 @@
 package com.github.theprogmatheus.mc.plugin.spawnerx.listener.spawners;
 
 import com.github.theprogmatheus.mc.plugin.spawnerx.SpawnerX;
+import com.github.theprogmatheus.mc.plugin.spawnerx.domain.BlockLocationKey;
 import com.github.theprogmatheus.mc.plugin.spawnerx.domain.SpawnerBlock;
 import com.github.theprogmatheus.mc.plugin.spawnerx.domain.SpawnerBlockConfig;
 import com.github.theprogmatheus.mc.plugin.spawnerx.util.LinkedObject;
@@ -38,6 +39,8 @@ public class SpawnerBlockPlaceListener implements Listener {
             player.sendMessage("§cEste spawner não está ativo no servidor, se você acha que isso é um bug, por favor fale com um admin.");
             return;
         }
+        LinkedObject.getLink(SpawnerBlock.class, BlockLocationKey.fromBukkitLocation(block.getLocation()))
+                .ifPresent(LinkedObject::unlink);
 
         new SpawnerBlock(block, spawnerConfigLink.get()).link();
     }

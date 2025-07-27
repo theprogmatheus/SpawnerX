@@ -2,18 +2,20 @@ package com.github.theprogmatheus.mc.plugin.spawnerx.util;
 
 import lombok.Getter;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 public abstract class LinkedObject<O> {
 
-    private static final Map<Class<? extends LinkedObject>, Map<Object, LinkedObject<?>>> linkers = new HashMap<>();
+    private static final Map<Class<? extends LinkedObject>, Map<Object, LinkedObject<?>>> linkers = new ConcurrentHashMap<>();
 
     private final transient O original;
 
     public LinkedObject(O original) {
+        if (original == null)
+            throw new IllegalArgumentException("Original reference cannot be null");
         this.original = original;
     }
 
@@ -24,10 +26,15 @@ public abstract class LinkedObject<O> {
         return Optional.ofNullable((T) linkerMap.get(original));
     }
 
-    public void link() {
+    public static <T extends LinkedObject<?>> Optional<Map<Object, T>> getLinkerMap(Class<? extends T> linkerClass) {
+        return Optional.ofNullable((Map<Object, T>) linkers.get(linkerClass));
+    }
+
+    public LinkedObject<O> link() {
         if (hasLinked())
             throw new RuntimeException("A link to this object already exists, use getLink() to retrieve the link for this object.");
         linkerMap().put(this.original, this);
+        return this;
     }
 
     public void unlink() {
@@ -42,7 +49,11 @@ public abstract class LinkedObject<O> {
         return false;
     }
 
+    public boolean isOk() {
+        return !isBroken();
+    }
+
     private Map<Object, LinkedObject<?>> linkerMap() {
-        return linkers.computeIfAbsent(getClass(), key -> new HashMap<>());
+        return linkers.computeIfAbsent(getClass(), key -> new ConcurrentHashMap<>());
     }
 }
