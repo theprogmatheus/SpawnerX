@@ -20,6 +20,6 @@ public class SpawnerBlockEntity {
     @DatabaseField(canBeNull = false)
     private String config;
 
-    @DatabaseField(canBeNull = false, persisterClass = SimpleObjectJSONPersister.class)
+    @DatabaseField(canBeNull = false, persisterClass = SimpleObjectJSONPersister.class, unique = true)
     private BlockLocationKey location;
 }

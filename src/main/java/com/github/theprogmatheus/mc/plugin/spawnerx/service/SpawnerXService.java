@@ -1,9 +1,9 @@
 package com.github.theprogmatheus.mc.plugin.spawnerx.service;
 
 import com.github.theprogmatheus.mc.plugin.spawnerx.SpawnerX;
-import com.github.theprogmatheus.mc.plugin.spawnerx.database.entity.SpawnerBlockEntity;
 import com.github.theprogmatheus.mc.plugin.spawnerx.database.mappers.SpawnerBlockMapper;
 import com.github.theprogmatheus.mc.plugin.spawnerx.database.repository.SpawnerBlockRepository;
+import com.github.theprogmatheus.mc.plugin.spawnerx.domain.MobEntity;
 import com.github.theprogmatheus.mc.plugin.spawnerx.domain.SpawnerBlock;
 import com.github.theprogmatheus.mc.plugin.spawnerx.domain.SpawnerBlockConfig;
 import com.github.theprogmatheus.mc.plugin.spawnerx.lib.Injector;
@@ -41,6 +41,7 @@ public class SpawnerXService extends PluginService {
         this.autoSaveAndPurgeTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this.plugin, this::saveSpawnerBlocks, 20 * 300, 20 * 300);
 
         loadSpawnerBlocks();
+        MobEntity.loadAllPersisted();
     }
 
 
@@ -73,15 +74,14 @@ public class SpawnerXService extends PluginService {
             try {
                 var link = LinkedObject.getLinkerMap(SpawnerBlock.class);
                 if (link.isPresent()) {
-                    var toSave = link.get()
-                            .values()
-                            .stream()
-                            .map(spawnerBlockMapper::mapFrom)
-                            .toList();
 
                     this.spawnerBlockRepository.callBatchTasks(() -> {
-                        for (SpawnerBlockEntity entity : toSave)
-                            this.spawnerBlockRepository.createOrUpdate(entity);
+                        for (var spawner : link.get().values()) {
+                            var spawnerEntity = spawnerBlockMapper.mapFrom(spawner);
+                            var result = this.spawnerBlockRepository.createOrUpdate(spawnerEntity);
+                            if (result.isCreated())
+                                spawner.setDbId(spawnerEntity.getId());
+                        }
                         return null;
                     });
                 }

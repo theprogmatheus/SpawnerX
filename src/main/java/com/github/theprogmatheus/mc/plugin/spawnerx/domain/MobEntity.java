@@ -1,24 +1,33 @@
 package com.github.theprogmatheus.mc.plugin.spawnerx.domain;
 
+import com.github.theprogmatheus.mc.plugin.spawnerx.SpawnerX;
+import com.github.theprogmatheus.mc.plugin.spawnerx.util.ExecutorTimeLogger;
 import com.github.theprogmatheus.mc.plugin.spawnerx.util.LinkedObject;
+import com.google.gson.Gson;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 @Getter
 public class MobEntity extends LinkedObject<UUID> {
 
+    private static final Gson gson = new Gson();
     private static final String stackedAmountDisplayFormat = "§fx%s";
+    private static final NamespacedKey dataNamespacedKey = new NamespacedKey("spawnerx", "mob_entity_data");
     private static final NamespacedKey mobEntityRefNamespacedKey = new NamespacedKey("spawnerx", "mob_entity_ref");
 
     private final transient LivingEntity entity;
+
     private int stackedAmount;
 
     MobEntity(@NotNull LivingEntity entity) {
@@ -34,7 +43,8 @@ public class MobEntity extends LinkedObject<UUID> {
         //entity.setAI(false);
 
         updateDisplayStackedAmount();
-        return this;
+
+        return persist();
     }
 
     public void updateDisplayStackedAmount() {
@@ -49,6 +59,7 @@ public class MobEntity extends LinkedObject<UUID> {
     public void stack() {
         this.stackedAmount++;
         this.updateDisplayStackedAmount();
+        this.persist();
     }
 
     public void unstack() {
@@ -59,6 +70,7 @@ public class MobEntity extends LinkedObject<UUID> {
         this.stackedAmount -= amount;
         if (this.stackedAmount > 0)
             this.updateDisplayStackedAmount();
+        this.persist();
     }
 
     private LivingEntity spawnFakeEntity() {
@@ -79,6 +91,12 @@ public class MobEntity extends LinkedObject<UUID> {
         }
     }
 
+    public MobEntity persist() {
+        this.entity.getPersistentDataContainer()
+                .set(dataNamespacedKey, PersistentDataType.STRING, gson.toJson(this));
+        return this;
+    }
+
     public static Optional<MobEntity> fromEntity(@NotNull LivingEntity entity) {
         return getLink(MobEntity.class, entity.getUniqueId());
     }
@@ -95,7 +113,31 @@ public class MobEntity extends LinkedObject<UUID> {
         }
     }
 
+    public static boolean hasMobEntityData(@NotNull LivingEntity entity) {
+        return entity.getPersistentDataContainer().has(dataNamespacedKey, PersistentDataType.STRING);
+    }
+
     public static MobEntity newMobEntity(@NotNull LivingEntity entity) {
-        return new MobEntity(entity).setup();
+        var dataContainer = entity.getPersistentDataContainer();
+
+        var serializedJsonData = dataContainer.get(dataNamespacedKey, PersistentDataType.STRING);
+        if (serializedJsonData == null)
+            return new MobEntity(entity).setup();
+
+        var deserializedData = gson.fromJson(serializedJsonData, MobEntity.class);
+        var mobEntity = new MobEntity(entity);
+        mobEntity.stackedAmount = deserializedData.stackedAmount;
+
+        return mobEntity.setup();
+    }
+
+    public static void loadAllPersisted() {
+        ExecutorTimeLogger.executeAndLogTime(SpawnerX.getInjector().getInstance(Logger.class),
+                "Load MobEntities", () -> Bukkit.getWorlds()
+                        .stream()
+                        .map(World::getEntities)
+                        .flatMap(List::stream)
+                        .filter(entity -> (entity instanceof LivingEntity livingEntity) && hasMobEntityData(livingEntity))
+                        .forEach(entity -> newMobEntity((LivingEntity) entity)));
     }
 }

@@ -11,18 +11,19 @@ import java.util.logging.Logger;
 @Getter
 public class SpawnerX extends JavaPlugin {
 
-    private Injector injector;
+    @Getter
+    private static Injector injector;
     private MainService mainService;
 
     @Override
     public void onLoad() {
-        this.injector = new Injector();
+        injector = new Injector();
     }
 
     @Override
     public void onEnable() {
         this.registerInjectorSingletons();
-        this.mainService = this.injector.getInstance(MainService.class);
+        this.mainService = injector.getInstance(MainService.class);
         this.mainService.startup();
     }
 
@@ -32,7 +33,7 @@ public class SpawnerX extends JavaPlugin {
     }
 
     private void registerInjectorSingletons() {
-        this.injector.registerSingleton(new Class[]{JavaPlugin.class, Plugin.class, SpawnerX.class}, this);
-        this.injector.registerSingleton(Logger.class, getLogger());
+        injector.registerSingleton(new Class[]{JavaPlugin.class, Plugin.class, SpawnerX.class}, this);
+        injector.registerSingleton(Logger.class, getLogger());
     }
 }

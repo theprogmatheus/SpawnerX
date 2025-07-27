@@ -2,18 +2,20 @@ package com.github.theprogmatheus.mc.plugin.spawnerx.util;
 
 import lombok.Getter;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 public abstract class LinkedObject<O> {
 
-    private static final Map<Class<? extends LinkedObject>, Map<Object, LinkedObject<?>>> linkers = new HashMap<>();
+    private static final Map<Class<? extends LinkedObject>, Map<Object, LinkedObject<?>>> linkers = new ConcurrentHashMap<>();
 
     private final transient O original;
 
     public LinkedObject(O original) {
+        if (original == null)
+            throw new IllegalArgumentException("Original reference cannot be null");
         this.original = original;
     }
 
@@ -51,6 +53,6 @@ public abstract class LinkedObject<O> {
     }
 
     private Map<Object, LinkedObject<?>> linkerMap() {
-        return linkers.computeIfAbsent(getClass(), key -> new HashMap<>());
+        return linkers.computeIfAbsent(getClass(), key -> new ConcurrentHashMap<>());
     }
 }
