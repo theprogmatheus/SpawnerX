@@ -23,7 +23,7 @@ public class MobSpawnListener implements Listener {
         if (event.isCancelled())
             return;
 
-        if (!(event.getEntity() instanceof LivingEntity entity))
+        if (!(event.getEntity() instanceof LivingEntity livingEntity))
             return;
 
         var spawnerLink = getLink(SpawnerBlock.class, BlockLocationKey.fromBukkitLocation(event.getSpawner().getLocation()));
@@ -31,14 +31,14 @@ public class MobSpawnListener implements Listener {
             return;
 
         var spawnerBlock = spawnerLink.get();
-        var spawnedMobs = spawnerBlock.getSpawnedMobs();
-
-        if (spawnedMobs.isEmpty())
-            spawnedMobs.add(MobEntity.newMobEntity(entity));
+        var mobEntity = spawnerBlock.findNearbyEntityOfType(event.getLocation(), 10);
+        if (mobEntity.isEmpty())
+            MobEntity.newMobEntity(livingEntity);
         else {
             event.setCancelled(true);
-            spawnedMobs.get(0).stack();
+            mobEntity.get().stack();
         }
+
     }
 
 

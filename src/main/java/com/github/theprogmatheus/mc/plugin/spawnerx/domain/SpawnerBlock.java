@@ -4,13 +4,15 @@ import com.github.theprogmatheus.mc.plugin.spawnerx.util.LinkedObject;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 @Getter
 @Setter
@@ -18,27 +20,19 @@ public class SpawnerBlock extends LinkedObject<BlockLocationKey> {
 
     private transient Long dbId;
     private final transient SpawnerBlockConfig config;
-    private transient List<MobEntity> spawnedMobs;
 
     public SpawnerBlock(@NotNull Block block, @NotNull SpawnerBlockConfig config) {
         super(BlockLocationKey.fromBukkitLocation(block.getLocation()));
         this.config = config;
-        this.spawnedMobs = new ArrayList<>();
     }
 
     public SpawnerBlock(@NotNull BlockLocationKey blockLocationKey, @NotNull SpawnerBlockConfig config) {
         super(blockLocationKey);
         this.config = config;
-        this.spawnedMobs = new ArrayList<>();
     }
 
     public Block getBlock() {
         return getOriginal().getBlock();
-    }
-
-    public List<MobEntity> getSpawnedMobs() {
-        this.spawnedMobs.removeIf(MobEntity::isBroken); //clean broken mobs (dead, or non exists)
-        return this.spawnedMobs;
     }
 
     @Override
@@ -50,6 +44,19 @@ public class SpawnerBlock extends LinkedObject<BlockLocationKey> {
                 this.config.updateCreatureSpawner(creatureSpawner);
         }
         return this;
+    }
+
+    public Optional<MobEntity> findNearbyEntityOfType(@NotNull Location loc, double radius) {
+        return findNearbyEntitiesOfType(loc, radius).findAny();
+    }
+
+    public Stream<MobEntity> findNearbyEntitiesOfType(@NotNull Location loc, double radius) {
+        return loc.getWorld()
+                .getNearbyEntities(loc, radius, radius, radius)
+                .stream()
+                .filter(entity -> entity instanceof LivingEntity && entity.getType().equals(this.config.getEntityType()))
+                .map(entity -> MobEntity.fromEntity((LivingEntity) entity))
+                .flatMap(Optional::stream);
     }
 
     @Override

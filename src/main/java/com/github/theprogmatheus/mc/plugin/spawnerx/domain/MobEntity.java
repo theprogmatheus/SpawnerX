@@ -6,6 +6,7 @@ import com.github.theprogmatheus.mc.plugin.spawnerx.util.LinkedObject;
 import com.google.gson.Gson;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
@@ -158,5 +159,15 @@ public class MobEntity extends LinkedObject<UUID> {
                         .flatMap(List::stream)
                         .filter(entity -> (entity instanceof LivingEntity livingEntity) && hasMobEntityData(livingEntity))
                         .forEach(entity -> newMobEntity((LivingEntity) entity)));
+    }
+
+
+    public static Optional<MobEntity> findNearby(@NotNull Location loc, double radius) {
+        return loc.getWorld().getNearbyEntities(loc, radius, radius, radius)
+                .stream()
+                .filter(entity -> entity instanceof LivingEntity)
+                .map(entity -> fromEntity((LivingEntity) entity))
+                .flatMap(Optional::stream)
+                .findAny();
     }
 }
