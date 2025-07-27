@@ -26,7 +26,7 @@ public class MobEntity extends LinkedObject<UUID> {
     private static final NamespacedKey dataNamespacedKey = new NamespacedKey("spawnerx", "mob_entity_data");
     private static final NamespacedKey mobEntityRefNamespacedKey = new NamespacedKey("spawnerx", "mob_entity_ref");
 
-    private final transient LivingEntity entity;
+    private transient LivingEntity entity;
 
     private int stackedAmount;
 
@@ -36,19 +36,37 @@ public class MobEntity extends LinkedObject<UUID> {
         this.stackedAmount = 1;
     }
 
-    public MobEntity setup() {
-        this.link();
-
-        entity.setCustomNameVisible(true);
-        //entity.setAI(false);
-
-        updateDisplayStackedAmount();
-
-        return persist();
+    public LivingEntity getEntity() {
+        var entity = (LivingEntity) Bukkit.getEntity(getOriginal());
+        if (entity == null)
+            return this.entity;
+        return this.entity = entity;
     }
 
-    public void updateDisplayStackedAmount() {
+    public void setEntity(@NotNull LivingEntity entity) {
+        if (entity.getUniqueId().equals(getOriginal()))
+            this.entity = entity;
+    }
+
+    public MobEntity setup() {
+        return ((MobEntity) super.link())
+                .setupDisplayName()
+                .persist();
+    }
+
+    private MobEntity setupDisplayName() {
+        var entity = getEntity();
+        entity.setCustomNameVisible(true);
+        return updateDisplayName(entity);
+    }
+
+    public MobEntity updateDisplayName() {
+        return updateDisplayName(getEntity());
+    }
+
+    private MobEntity updateDisplayName(@NotNull LivingEntity entity) {
         entity.setCustomName(stackedAmountDisplayFormat.formatted(this.stackedAmount));
+        return this;
     }
 
     @Override
@@ -58,7 +76,7 @@ public class MobEntity extends LinkedObject<UUID> {
 
     public void stack() {
         this.stackedAmount++;
-        this.updateDisplayStackedAmount();
+        this.updateDisplayName();
         this.persist();
     }
 
@@ -69,13 +87,13 @@ public class MobEntity extends LinkedObject<UUID> {
     public void unstack(int amount) {
         this.stackedAmount -= amount;
         if (this.stackedAmount > 0)
-            this.updateDisplayStackedAmount();
+            this.updateDisplayName();
         this.persist();
     }
 
     private LivingEntity spawnFakeEntity() {
-        var loc = entity.getLocation();
-        var fakeEntity = (LivingEntity) loc.getWorld().spawnEntity(loc, entity.getType());
+        var loc = getEntity().getLocation();
+        var fakeEntity = (LivingEntity) loc.getWorld().spawnEntity(loc, getEntity().getType());
         fakeEntity.getPersistentDataContainer()
                 .set(mobEntityRefNamespacedKey, PersistentDataType.STRING, getOriginal().toString());
         return fakeEntity;
@@ -84,7 +102,8 @@ public class MobEntity extends LinkedObject<UUID> {
     public void simulateDeath(LivingEntity killer, int amount) {
         this.unstack(amount);
         if (this.stackedAmount > 0) {
-            this.entity.setHealth(this.entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
+            var entity = getEntity();
+            entity.setHealth(entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 
             var fakeEntity = spawnFakeEntity();
             fakeEntity.damage(fakeEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue(), killer);
@@ -92,7 +111,7 @@ public class MobEntity extends LinkedObject<UUID> {
     }
 
     public MobEntity persist() {
-        this.entity.getPersistentDataContainer()
+        getEntity().getPersistentDataContainer()
                 .set(dataNamespacedKey, PersistentDataType.STRING, gson.toJson(this));
         return this;
     }

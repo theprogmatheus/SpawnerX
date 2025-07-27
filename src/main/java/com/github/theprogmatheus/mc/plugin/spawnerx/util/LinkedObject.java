@@ -30,10 +30,11 @@ public abstract class LinkedObject<O> {
         return Optional.ofNullable((Map<Object, T>) linkers.get(linkerClass));
     }
 
-    public void link() {
+    public LinkedObject<O> link() {
         if (hasLinked())
             throw new RuntimeException("A link to this object already exists, use getLink() to retrieve the link for this object.");
         linkerMap().put(this.original, this);
+        return this;
     }
 
     public void unlink() {

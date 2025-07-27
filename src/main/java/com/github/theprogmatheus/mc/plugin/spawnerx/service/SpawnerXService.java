@@ -41,7 +41,6 @@ public class SpawnerXService extends PluginService {
         this.autoSaveAndPurgeTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this.plugin, this::saveSpawnerBlocks, 20 * 300, 20 * 300);
 
         loadSpawnerBlocks();
-        MobEntity.loadAllPersisted();
     }
 
 

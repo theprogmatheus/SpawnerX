@@ -42,13 +42,14 @@ public class SpawnerBlock extends LinkedObject<BlockLocationKey> {
     }
 
     @Override
-    public void link() {
-        if (!super.hasLinked()){
+    public LinkedObject<BlockLocationKey> link() {
+        if (!super.hasLinked()) {
             super.link();
 
             if (getBlock().getState() instanceof CreatureSpawner creatureSpawner)
                 this.config.updateCreatureSpawner(creatureSpawner);
         }
+        return this;
     }
 
     @Override
