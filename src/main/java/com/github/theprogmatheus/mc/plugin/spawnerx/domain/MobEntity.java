@@ -29,10 +29,10 @@ public class MobEntity extends LinkedObject<UUID> {
     private static final NamespacedKey dataNamespacedKey = new NamespacedKey("spawnerx", "mob_entity_data");
     private static final NamespacedKey mobEntityRefNamespacedKey = new NamespacedKey("spawnerx", "mob_entity_ref");
 
-    private transient SpawnerBlock spawnerBlock;
     private transient LivingEntity entity;
 
     private int stackedAmount;
+    private BlockLocationKey spawner;
 
     MobEntity(@NotNull LivingEntity entity) {
         super(entity.getUniqueId());
@@ -116,14 +116,16 @@ public class MobEntity extends LinkedObject<UUID> {
         this.processMobDrops(killer, this.stackedAmount > 0 ? amount : this.stackedAmount + amount);
     }
 
+    public SpawnerBlock getSpawnerBlock() {
+        if (this.spawner != null)
+            return LinkedObject.getLink(SpawnerBlock.class, this.spawner).orElse(null);
+        return null;
+    }
+
     public void processMobDrops(@NotNull LivingEntity killer, int amount) {
         var spawner = getSpawnerBlock();
-        if (spawner == null)
-            return;
-
-        // dropar experiência se houver
-        // dropar items, se houver
-
+        if (spawner != null)
+            MobDropper.dropAll(this, spawner.getConfig().getMobConfig(), killer, amount);
     }
 
     public MobEntity persist() {

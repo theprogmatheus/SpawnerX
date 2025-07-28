@@ -33,7 +33,8 @@ public class MobSpawnListener implements Listener {
         var spawnerBlock = spawnerLink.get();
         var mobEntity = spawnerBlock.findNearbyEntityOfType(event.getLocation(), 10);
         if (mobEntity.isEmpty())
-            MobEntity.newMobEntity(livingEntity);
+            MobEntity.newMobEntity(livingEntity)
+                    .setSpawner(spawnerBlock.getOriginal());
         else {
             event.setCancelled(true);
             mobEntity.get().stack();
