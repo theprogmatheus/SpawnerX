@@ -9,30 +9,23 @@ import java.util.List;
 @Data
 public abstract class MobDrop {
 
-    private double chance = 100.0;
+    private double chance = 1.0;
+    private double positiveNoise = 0.15;
+    private double negativeNoise = 0.25;
     private long delay = 0;
 
-
-    public void handleDrop() {
-
-    }
-
     @Data
     @EqualsAndHashCode(callSuper = true)
-    public class MobDropItem extends MobDrop {
-
+    public static class MobDropItem extends MobDrop {
         private final ItemStack item;
         private final int min, max;
-        private boolean looting;
-
+        private double looting;
     }
 
     @Data
     @EqualsAndHashCode(callSuper = true)
-    public class MobDropCommand extends MobDrop {
-
+    public static class MobDropCommand extends MobDrop {
         private final List<String> commands;
-
     }
 
 }
