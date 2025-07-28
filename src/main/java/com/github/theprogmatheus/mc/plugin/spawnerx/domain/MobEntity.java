@@ -5,6 +5,7 @@ import com.github.theprogmatheus.mc.plugin.spawnerx.util.ExecutorTimeLogger;
 import com.github.theprogmatheus.mc.plugin.spawnerx.util.LinkedObject;
 import com.google.gson.Gson;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -19,6 +20,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+@Setter
 @Getter
 public class MobEntity extends LinkedObject<UUID> {
 
@@ -27,6 +29,7 @@ public class MobEntity extends LinkedObject<UUID> {
     private static final NamespacedKey dataNamespacedKey = new NamespacedKey("spawnerx", "mob_entity_data");
     private static final NamespacedKey mobEntityRefNamespacedKey = new NamespacedKey("spawnerx", "mob_entity_ref");
 
+    private transient SpawnerBlock spawnerBlock;
     private transient LivingEntity entity;
 
     private int stackedAmount;
@@ -100,7 +103,7 @@ public class MobEntity extends LinkedObject<UUID> {
         return fakeEntity;
     }
 
-    public void simulateDeath(LivingEntity killer, int amount) {
+    public void simulateDeath(@NotNull LivingEntity killer, int amount) {
         this.unstack(amount);
         if (this.stackedAmount > 0) {
             var entity = getEntity();
@@ -109,6 +112,18 @@ public class MobEntity extends LinkedObject<UUID> {
             var fakeEntity = spawnFakeEntity();
             fakeEntity.damage(fakeEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue(), killer);
         }
+
+        this.processMobDrops(killer, this.stackedAmount > 0 ? amount : this.stackedAmount + amount);
+    }
+
+    public void processMobDrops(@NotNull LivingEntity killer, int amount) {
+        var spawner = getSpawnerBlock();
+        if (spawner == null)
+            return;
+
+        // dropar experiência se houver
+        // dropar items, se houver
+
     }
 
     public MobEntity persist() {

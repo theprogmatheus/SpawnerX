@@ -54,7 +54,7 @@ public class SpawnerBlock extends LinkedObject<BlockLocationKey> {
         return loc.getWorld()
                 .getNearbyEntities(loc, radius, radius, radius)
                 .stream()
-                .filter(entity -> entity instanceof LivingEntity && entity.getType().equals(this.config.getEntityType()))
+                .filter(entity -> entity instanceof LivingEntity && entity.getType().equals(this.config.getMobConfig().getEntityType()))
                 .map(entity -> MobEntity.fromEntity((LivingEntity) entity))
                 .flatMap(Optional::stream);
     }

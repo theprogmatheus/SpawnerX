@@ -27,9 +27,8 @@ public class SpawnerBlockConfig extends LinkedObject<String> {
     private final transient NamespacedKey namespacedKey;
 
     private final String id;
-    private final EntityType entityType;
+    private final MobConfig mobConfig;
 
-    private String entityName;
     private int delay = 20;
     private int minSpawnDelay = 40;
     private int maxSpawnDelay = 100;
@@ -38,13 +37,12 @@ public class SpawnerBlockConfig extends LinkedObject<String> {
     private int requiredPlayerRange = 4;
     private int maxNearbyEntities = 16;
 
-    public SpawnerBlockConfig(@NotNull Plugin plugin, @NotNull String id, @NotNull EntityType entityType) {
+    public SpawnerBlockConfig(@NotNull Plugin plugin, @NotNull String id, @NotNull MobConfig mobConfig) {
         super(id.toLowerCase());
         this.plugin = plugin;
         this.namespacedKey = getNamespacedKey(plugin);
         this.id = id.toLowerCase();
-        this.entityType = entityType;
-        this.entityName = entityType.name();
+        this.mobConfig = mobConfig;
     }
 
 
@@ -56,7 +54,7 @@ public class SpawnerBlockConfig extends LinkedObject<String> {
         persistentDataContainer.set(this.namespacedKey, PersistentDataType.STRING, this.id);
         itemMeta.setDisplayName("§6Mob Spawner");
         itemMeta.setLore(List.of(
-                "§7Type: §f" + this.entityName
+                "§7Type: §f" + this.mobConfig.getDisplayName()
         ));
 
         itemStack.setItemMeta(itemMeta);
@@ -64,7 +62,7 @@ public class SpawnerBlockConfig extends LinkedObject<String> {
     }
 
     public boolean updateCreatureSpawner(@NotNull CreatureSpawner creatureSpawner) {
-        creatureSpawner.setSpawnedType(this.entityType);
+        creatureSpawner.setSpawnedType(this.mobConfig.getEntityType());
 
         creatureSpawner.setDelay(this.delay);
         creatureSpawner.setMinSpawnDelay(this.minSpawnDelay);
@@ -80,7 +78,7 @@ public class SpawnerBlockConfig extends LinkedObject<String> {
     public static void loadDefaults(@NotNull Plugin plugin) {
         Arrays.stream(EntityType.values())
                 .filter(EntityType::isAlive)
-                .forEach(entityType -> new SpawnerBlockConfig(plugin, entityType.name(), entityType).link());
+                .forEach(entityType -> new SpawnerBlockConfig(plugin, entityType.name(), new MobConfig(entityType, entityType.name())).link());
     }
 
     public static String getSpawnerBlockConfigId(@NotNull Plugin plugin, @NotNull ItemStack itemStack) {

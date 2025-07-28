@@ -39,14 +39,20 @@ public class MobDeathListener implements Listener {
         if (optional.isPresent()) {
             var mob = optional.get();
             mob.unlink();
-        } else {
-            optional = MobEntity.fromFakeEntity(entity);
-            if (optional.isEmpty())
+
+            var spawnerBlock = mob.getSpawnerBlock();
+            if (spawnerBlock == null)
                 return;
-            var mob = optional.get();
 
-            // processar os drops, xp etc...
+            var mobConfig = spawnerBlock.getConfig().getMobConfig();
+            var drops = mobConfig.getDrops();
+            var exp = mobConfig.getDropExp();
 
+            if (drops != null)
+                event.getDrops().clear();
+
+            if (exp >= 0)
+                event.setDroppedExp(0);
         }
     }
 

@@ -2,6 +2,7 @@ package com.github.theprogmatheus.mc.plugin.spawnerx.database.mappers;
 
 import com.github.theprogmatheus.mc.plugin.spawnerx.SpawnerX;
 import com.github.theprogmatheus.mc.plugin.spawnerx.database.entity.SpawnerBlockEntity;
+import com.github.theprogmatheus.mc.plugin.spawnerx.domain.MobConfig;
 import com.github.theprogmatheus.mc.plugin.spawnerx.domain.SpawnerBlock;
 import com.github.theprogmatheus.mc.plugin.spawnerx.domain.SpawnerBlockConfig;
 import com.github.theprogmatheus.mc.plugin.spawnerx.util.LinkedObject;
@@ -26,7 +27,7 @@ public class SpawnerBlockMapper implements ObjectMapper<SpawnerBlockEntity, Spaw
         var configLink = LinkedObject.getLink(SpawnerBlockConfig.class, configId);
         var spawnerBlock = configLink
                 .map(config -> new SpawnerBlock(location, config))
-                .orElseGet(() -> new SpawnerBlock(location, new SpawnerBlockConfig(this.plugin, configId, EntityType.UNKNOWN)));
+                .orElseGet(() -> new SpawnerBlock(location, new SpawnerBlockConfig(this.plugin, configId, new MobConfig(EntityType.UNKNOWN, "UNKNOWN"))));
 
         spawnerBlock.setDbId(spawnerBlockEntity.getId());
         return spawnerBlock;
