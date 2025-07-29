@@ -37,7 +37,12 @@ public class MobSpawnListener implements Listener {
                     .setSpawner(spawnerBlock.getOriginal());
         else {
             event.setCancelled(true);
-            mobEntity.get().stack();
+            var mob = mobEntity.get();
+            if (mob.getSpawnerBlock() == null) {
+                mob.setSpawner(spawnerBlock.getOriginal());
+                mob.persist();
+            }
+            mob.stack();
         }
 
     }

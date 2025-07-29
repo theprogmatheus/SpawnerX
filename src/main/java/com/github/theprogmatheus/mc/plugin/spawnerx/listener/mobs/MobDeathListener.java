@@ -34,12 +34,14 @@ public class MobDeathListener implements Listener {
     @EventHandler
     void onMobDeath(EntityDeathEvent event) {
         var entity = event.getEntity();
-        var optional = MobEntity.fromEntity(entity);
+        var mobEntityOptional = MobEntity.fromEntity(entity);
 
-        if (optional.isPresent()) {
-            var mob = optional.get();
-            mob.unlink();
+        mobEntityOptional.ifPresent(MobEntity::unlink);
 
+        if (mobEntityOptional.isEmpty())
+            mobEntityOptional = MobEntity.fromFakeEntity(entity);
+
+        mobEntityOptional.ifPresent(mob -> {
             var spawnerBlock = mob.getSpawnerBlock();
             if (spawnerBlock == null)
                 return;
@@ -53,7 +55,7 @@ public class MobDeathListener implements Listener {
 
             if (exp >= 0)
                 event.setDroppedExp(0);
-        }
+        });
     }
 
 

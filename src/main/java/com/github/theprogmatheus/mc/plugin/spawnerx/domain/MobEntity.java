@@ -4,8 +4,10 @@ import com.github.theprogmatheus.mc.plugin.spawnerx.SpawnerX;
 import com.github.theprogmatheus.mc.plugin.spawnerx.util.ExecutorTimeLogger;
 import com.github.theprogmatheus.mc.plugin.spawnerx.util.LinkedObject;
 import com.google.gson.Gson;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
@@ -22,6 +24,8 @@ import java.util.logging.Logger;
 
 @Setter
 @Getter
+@EqualsAndHashCode(callSuper = true)
+@ToString
 public class MobEntity extends LinkedObject<UUID> {
 
     private static final Gson gson = new Gson();
