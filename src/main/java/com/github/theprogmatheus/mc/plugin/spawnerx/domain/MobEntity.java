@@ -34,13 +34,15 @@ public class MobEntity extends LinkedObject<UUID> {
     private static final NamespacedKey mobEntityRefNamespacedKey = new NamespacedKey("spawnerx", "mob_entity_ref");
 
     private transient LivingEntity entity;
+    private final transient MobConfig config;
 
     private int stackedAmount;
     private BlockLocationKey spawner;
 
-    MobEntity(@NotNull LivingEntity entity) {
+    MobEntity(@NotNull LivingEntity entity, @NotNull MobConfig config) {
         super(entity.getUniqueId());
         this.entity = entity;
+        this.config = config;
         this.stackedAmount = 1;
     }
 
@@ -116,19 +118,13 @@ public class MobEntity extends LinkedObject<UUID> {
             var fakeEntity = spawnFakeEntity();
             fakeEntity.damage(fakeEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue(), killer);
         }
-        this.processMobDrops(killer, this.stackedAmount > 0 ? amount : this.stackedAmount + amount);
+        MobDropper.dropAll(this, this.config, killer, amount);
     }
 
     public SpawnerBlock getSpawnerBlock() {
         if (this.spawner != null)
             return LinkedObject.getLink(SpawnerBlock.class, this.spawner).orElse(null);
         return null;
-    }
-
-    public void processMobDrops(@NotNull LivingEntity killer, int amount) {
-        var config = MobConfig.getConfig(this.entity.getType());
-        if (config != null)
-            MobDropper.dropAll(this, config, killer, amount);
     }
 
     public MobEntity persist() {
@@ -158,14 +154,18 @@ public class MobEntity extends LinkedObject<UUID> {
     }
 
     public static MobEntity newMobEntity(@NotNull LivingEntity entity) {
+        var config = MobConfig.getConfig(entity.getType());
+        if (config == null)
+            throw new IllegalArgumentException("A loaded config was not found for this entity type: %s".formatted(entity.getType()));
+
         var dataContainer = entity.getPersistentDataContainer();
 
         var serializedJsonData = dataContainer.get(dataNamespacedKey, PersistentDataType.STRING);
         if (serializedJsonData == null)
-            return new MobEntity(entity).setup();
+            return new MobEntity(entity, config).setup();
 
         var deserializedData = gson.fromJson(serializedJsonData, MobEntity.class);
-        var mobEntity = new MobEntity(entity);
+        var mobEntity = new MobEntity(entity, config);
         mobEntity.stackedAmount = deserializedData.stackedAmount;
         mobEntity.spawner = deserializedData.spawner;
 
