@@ -27,7 +27,7 @@ public class SpawnerBlockMapper implements ObjectMapper<SpawnerBlockEntity, Spaw
         var configLink = LinkedObject.getLink(SpawnerBlockConfig.class, configId);
         var spawnerBlock = configLink
                 .map(config -> new SpawnerBlock(location, config))
-                .orElseGet(() -> new SpawnerBlock(location, new SpawnerBlockConfig(this.plugin, configId, new MobConfig(EntityType.UNKNOWN, "UNKNOWN"))));
+                .orElseGet(() -> new SpawnerBlock(location, new SpawnerBlockConfig(this.plugin, configId, new MobConfig(EntityType.UNKNOWN.name(), EntityType.UNKNOWN, "UNKNOWN"))));
 
         spawnerBlock.setDbId(spawnerBlockEntity.getId());
         return spawnerBlock;

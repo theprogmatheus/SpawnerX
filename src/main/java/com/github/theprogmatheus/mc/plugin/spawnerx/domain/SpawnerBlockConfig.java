@@ -78,7 +78,7 @@ public class SpawnerBlockConfig extends LinkedObject<String> {
     public static void loadDefaults(@NotNull Plugin plugin) {
         Arrays.stream(EntityType.values())
                 .filter(EntityType::isAlive)
-                .forEach(entityType -> new SpawnerBlockConfig(plugin, entityType.name(), new MobConfig(entityType, entityType.name())).link());
+                .forEach(entityType -> new SpawnerBlockConfig(plugin, entityType.name(), new MobConfig(entityType.name(), entityType, entityType.name())).link());
         var config = LinkedObject.getLink(SpawnerBlockConfig.class, EntityType.COW.name().toLowerCase());
 
         config.ifPresent(spawnerBlockConfig -> spawnerBlockConfig.getMobConfig().setDrops(List.of(
