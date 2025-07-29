@@ -168,6 +168,7 @@ public class MobEntity extends LinkedObject<UUID> {
         var deserializedData = gson.fromJson(serializedJsonData, MobEntity.class);
         var mobEntity = new MobEntity(entity);
         mobEntity.stackedAmount = deserializedData.stackedAmount;
+        mobEntity.spawner = deserializedData.spawner;
 
         return mobEntity.setup();
     }
