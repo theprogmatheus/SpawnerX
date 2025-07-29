@@ -15,7 +15,7 @@ public class LocationKeyPersister extends BaseDataType {
     private static final LocationKeyPersister singleton = new LocationKeyPersister();
 
     public LocationKeyPersister() {
-        super(SqlType.STRING, new Class<?>[]{BlockLocationKey.class});
+        super(SqlType.LONG_STRING, new Class<?>[]{BlockLocationKey.class});
     }
 
     @Override

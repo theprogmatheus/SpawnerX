@@ -1,7 +1,9 @@
 package com.github.theprogmatheus.mc.plugin.spawnerx.domain;
 
+import com.github.theprogmatheus.mc.plugin.spawnerx.config.env.Config;
 import com.github.theprogmatheus.mc.plugin.spawnerx.kdtree.KDNode;
 import com.github.theprogmatheus.mc.plugin.spawnerx.kdtree.KDTree;
+import com.github.theprogmatheus.mc.plugin.spawnerx.util.InventoryUtils;
 import com.github.theprogmatheus.mc.plugin.spawnerx.util.LinkedObject;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.jetbrains.annotations.NotNull;
@@ -109,6 +112,11 @@ public class SpawnerBlock extends LinkedObject<BlockLocationKey> {
         if (player.getGameMode() == GameMode.CREATIVE)
             return;
 
+        var inventory = player.getInventory();
+        var itemInMainHand = inventory.getItemInMainHand();
+        if (Config.SPAWNERS_ONLY_SILKTOUCH.getValue() && (!itemInMainHand.containsEnchantment(Enchantment.SILK_TOUCH)))
+            return;
+
         var loc = event.getBlock().getLocation().add(0.5, 0.5, 0.5);
         var world = loc.getWorld();
         if (world == null)
@@ -118,8 +126,14 @@ public class SpawnerBlock extends LinkedObject<BlockLocationKey> {
         event.setExpToDrop(0);
 
         var item = this.config.createItemStack(1);
-        loc.getWorld().dropItemNaturally(loc, item);
+
+        var availableSpace = InventoryUtils.getAvailableSpaceForItem(inventory.getContents(), item);
+        if (availableSpace > 0)
+            inventory.addItem(item);
+        else
+            loc.getWorld().dropItemNaturally(loc, item);
     }
+
 
     public static boolean isValidBukkitSpawnerBlock(@NotNull Block block) {
         return block.getState() instanceof CreatureSpawner;
