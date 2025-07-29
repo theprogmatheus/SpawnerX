@@ -79,6 +79,11 @@ public class SpawnerBlockConfig extends LinkedObject<String> {
         Arrays.stream(EntityType.values())
                 .filter(EntityType::isAlive)
                 .forEach(entityType -> new SpawnerBlockConfig(plugin, entityType.name(), new MobConfig(entityType, entityType.name())).link());
+        var config = LinkedObject.getLink(SpawnerBlockConfig.class, EntityType.COW.name().toLowerCase());
+
+        config.ifPresent(spawnerBlockConfig -> spawnerBlockConfig.getMobConfig().setDrops(List.of(
+                new MobDrop.MobDropItem(new ItemStack(Material.STONE), 1, 3)
+        )));
     }
 
     public static String getSpawnerBlockConfigId(@NotNull Plugin plugin, @NotNull ItemStack itemStack) {

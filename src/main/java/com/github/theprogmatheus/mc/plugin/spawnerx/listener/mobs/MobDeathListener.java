@@ -49,12 +49,16 @@ public class MobDeathListener implements Listener {
             var mobConfig = spawnerBlock.getConfig().getMobConfig();
             var drops = mobConfig.getDrops();
             var exp = mobConfig.getDropExp();
+            var killer = entity.getKiller();
 
             if (drops != null)
                 event.getDrops().clear();
 
-            if (exp >= 0)
+            if (exp >= 0 || killer != null) {
+                if (killer != null)
+                    killer.giveExp(event.getDroppedExp());
                 event.setDroppedExp(0);
+            }
         });
     }
 
