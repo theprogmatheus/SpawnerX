@@ -54,13 +54,13 @@ public class Config {
     public static final ConfigurationHolder<Boolean> MOBS_KNOCKBACK_MOB =
             new ConfigurationHolder<>("mobs.knockback_mob", Boolean.class);
     public static final ConfigurationHolder<Boolean> MOBS_HITKILL_MOB =
-            new ConfigurationHolder<>("mobs.hitkill_mob ", Boolean.class);
+            new ConfigurationHolder<>("mobs.hitkill_mob", Boolean.class);
     public static final ConfigurationHolder<Boolean> MOBS_SHIFT_KILL_ONE =
             new ConfigurationHolder<>("mobs.shift_kill_one", Boolean.class);
     public static final ConfigurationHolder<Boolean> MOBS_PERFORMANCE_MOB_STACK_KILL =
-            new ConfigurationHolder<>("mobs.performance.mob.stack_kill", Boolean.class);
+            new ConfigurationHolder<>("mobs.performance_mob.stack_kill", Boolean.class);
     public static final ConfigurationHolder<Integer> MOBS_PERFORMANCE_MOB_CHUNK =
-            new ConfigurationHolder<>("mobs.performance.mob.chunk", Integer.class);
+            new ConfigurationHolder<>("mobs.performance_mob.chunk", Integer.class);
     public static final ConfigurationHolder<ConfigurationSection> MOBS_PER_MOB =
             new ConfigurationHolder<>("mobs.per_mob", ConfigurationSection.class);
 }
