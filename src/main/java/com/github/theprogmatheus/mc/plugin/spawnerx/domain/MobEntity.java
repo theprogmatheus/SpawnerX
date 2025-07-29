@@ -1,6 +1,7 @@
 package com.github.theprogmatheus.mc.plugin.spawnerx.domain;
 
 import com.github.theprogmatheus.mc.plugin.spawnerx.SpawnerX;
+import com.github.theprogmatheus.mc.plugin.spawnerx.util.ArrayUtils;
 import com.github.theprogmatheus.mc.plugin.spawnerx.util.ExecutorTimeLogger;
 import com.github.theprogmatheus.mc.plugin.spawnerx.util.LinkedObject;
 import com.google.gson.Gson;
@@ -76,7 +77,19 @@ public class MobEntity extends LinkedObject<UUID> {
     }
 
     private MobEntity updateDisplayName(@NotNull LivingEntity entity) {
-        entity.setCustomName(stackedAmountDisplayFormat.formatted(this.stackedAmount));
+        var displayFormat = getConfig().getStackDisplayFormat();
+
+        var placeholders = ArrayUtils.toMap(new String[]{
+                "stack_mob", String.valueOf(this.stackedAmount),
+                "stack_amount", String.valueOf(this.stackedAmount),
+                "type_mob", this.entity.getType().name(),
+                "display_name", getConfig().getDisplayName()
+        });
+
+        for (var entry : placeholders.entrySet())
+            displayFormat = displayFormat.replace("%".concat(entry.getKey()).concat("%"), entry.getValue());
+
+        entity.setCustomName(displayFormat);
         return this;
     }
 
