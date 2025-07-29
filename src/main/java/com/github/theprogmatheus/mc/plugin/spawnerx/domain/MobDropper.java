@@ -66,6 +66,9 @@ public class MobDropper {
     }
 
     private static long calculateDropAmount(@NotNull MobDrop drop, long amount) {
+        if (amount <= 0)
+            return 0;
+
         double dropChance = drop.getChance();
         if (dropChance <= 0)
             return 0;
@@ -84,7 +87,7 @@ public class MobDropper {
         if (rand.nextDouble() < (expected % 1))
             result++;
 
-        return result;
+        return Math.min(result, amount * max);
     }
 
     private static void dropItem(@NotNull MobDrop.MobDropItem item, @NotNull Location location, long amountToDrop) {
