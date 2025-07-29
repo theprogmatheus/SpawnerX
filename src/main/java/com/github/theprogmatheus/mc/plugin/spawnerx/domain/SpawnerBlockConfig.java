@@ -15,7 +15,9 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -90,6 +92,10 @@ public class SpawnerBlockConfig extends LinkedObject<String> {
 
     public static NamespacedKey getNamespacedKey(@NotNull Plugin plugin) {
         return new NamespacedKey(plugin, "spawner_block_config");
+    }
+
+    public static Collection<SpawnerBlockConfig> getAvailableSpawnerConfigs() {
+        return LinkedObject.getLinkerMap(SpawnerBlockConfig.class).orElse(Map.of()).values();
     }
 
 }

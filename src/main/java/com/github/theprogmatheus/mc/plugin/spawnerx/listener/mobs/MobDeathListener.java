@@ -33,7 +33,7 @@ public class MobDeathListener implements Listener {
                 if (config.isHitKill())
                     event.setDamage(entity.getHealth());
 
-                if (!config.isKnockBack())
+                if (config.isAi() && !config.isKnockBack())
                     Bukkit.getScheduler().runTaskLater(this.plugin, () -> entity.setVelocity(new Vector(0, 0, 0)), 1);
 
                 if ((event.getDamage() >= entity.getHealth())) {

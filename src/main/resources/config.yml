@@ -6,7 +6,7 @@ config-version: 1.0
 lang:
   # Idioma padrão utilizado nas mensagens do plugin.
   # Exemplo: "en_us", "pt_br"
-  default: "en_us"
+  default: "pt_br"
 
   # Se verdadeiro, o plugin usará o idioma individual do jogador
   # (baseado nas configurações de idioma do Minecraft).

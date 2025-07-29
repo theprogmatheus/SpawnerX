@@ -58,9 +58,6 @@ public class CommandService extends PluginService {
     }
 
     private void registerCommand(Class<? extends AbstractCommand> commandClass) {
-        AbstractCommand command = this.injector.getInstance(commandClass);
-        command.resolveContexts(this.commandManager.getCommandContexts());
-        command.resolveConditions(this.commandManager.getCommandConditions());
-        this.commandManager.registerCommand(command);
+        this.commandManager.registerCommand(this.injector.getInstance(commandClass).init(this.commandManager));
     }
 }
