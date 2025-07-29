@@ -85,6 +85,8 @@ public class MobEntity extends LinkedObject<UUID> {
     }
 
     public void stack() {
+        if (this.stackedAmount >= getConfig().getStackMax())
+            return;
         this.stackedAmount++;
         this.updateDisplayName();
         this.persist();
@@ -158,6 +160,7 @@ public class MobEntity extends LinkedObject<UUID> {
         if (config == null)
             throw new IllegalArgumentException("A loaded config was not found for this entity type: %s".formatted(entity.getType()));
 
+
         var dataContainer = entity.getPersistentDataContainer();
 
         var serializedJsonData = dataContainer.get(dataNamespacedKey, PersistentDataType.STRING);
@@ -169,6 +172,8 @@ public class MobEntity extends LinkedObject<UUID> {
         mobEntity.stackedAmount = deserializedData.stackedAmount;
         mobEntity.spawner = deserializedData.spawner;
 
+        // setup config
+        entity.setAI(config.isAi());
         return mobEntity.setup();
     }
 
