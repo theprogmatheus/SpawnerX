@@ -1,9 +1,188 @@
-# Config Template
+# =====================[ CONFIGURATION FILE - SpawnerX ]===================== #
+# Versão do arquivo de configuração. Não altere, a menos que orientado.
 config-version: 1.0
 
-# Define de messages lang
+# =====================[ IDIOMA DAS MENSAGENS ]===================== #
 lang:
-  # Define the default lang
-  default: "pt_br"
-  #Define if you want to use individual lang per player settings
+  # Idioma padrão utilizado nas mensagens do plugin.
+  # Exemplo: "en_us", "pt_br"
+  default: "en_us"
+
+  # Se verdadeiro, o plugin usará o idioma individual do jogador
+  # (baseado nas configurações de idioma do Minecraft).
   individual: true
+
+# =====================[ CONFIGURAÇÕES DE SPAWNERS ]===================== #
+spawners:
+  # Exibe um holograma acima do spawner (apenas se o empilhamento de spawners estiver ativo).
+  hologram: false
+
+  # Formato das linhas do holograma. Use variáveis como:
+  # %stack_spawner% = quantidade de spawners
+  # %type_mob% = tipo de mob
+  format:
+    - "&6&lMOBSPAWNER"
+    - "&6%stack_spawner% &f%type_mob%"
+
+  # Configurações para empilhamento (stack) de spawners.
+  stack:
+    # Ativa o empilhamento de spawners do mesmo tipo próximos.
+    enable: false
+
+    # Número máximo de spawners que podem ser empilhados.
+    max: 30
+
+    # Distância máxima (em blocos) entre spawners para empilhamento (em segundos).
+    distance: 5
+
+  # Define se o spawner só pode ser dropado com Silk Touch.
+  # true = apenas com picareta com Silk Touch
+  # false = qualquer picareta
+  only_silktouch: true
+
+# =====================[ CONFIGURAÇÕES DE MOBS ]===================== #
+mobs:
+  # Formato de exibição do nome da pilha de mobs.
+  # Exemplo: x5 Cow
+  format: "&6x%stack_mob% &f%type_mob%"
+
+  # Quantidade máxima de mobs que podem ser empilhados.
+  stack_max: 300
+
+  # Quantos mobs devem morrer por cada spawner ativo na chunk ao abater a pilha.
+  kill_stack_per_spawner: 1
+
+  # Tempo base (em segundos) para o spawner gerar mobs.
+  temp_spawn: 10
+
+  # Se verdadeiro, quanto mais spawners houver na chunk, menor será o tempo de spawn.
+  more_spawners_temp_reduction: true
+
+  # Redução no tempo de spawn (em ticks) por spawner adicional.
+  # 20 tickspeed = 1 segundo
+  temp_reduction: 10
+
+  # Tempo mínimo de spawn (em segundos), mesmo com milhares de spawners.
+  max_reduction: 3
+
+  # Desativa a IA dos mobs empilhados (eles ficam imóveis).
+  ai_mob: true
+
+  # Impede que o mob empilhado sofra knockback ao ser atingido.
+  knockback_mob: true
+
+  # Faz com que qualquer golpe elimine instantaneamente o mob empilhado.
+  hitkill_mob: false
+
+  # Se habilitado, faz com que utilizando shift mate o mob de 1 em 1.
+  shift_kill_one: false
+
+  # Configurações de otimização de desempenho.
+  performance_mob:
+    # Remove a pilha de mobs se não houver nenhum jogador nas redondezas.
+    stack_kill: true
+
+    # Define o número mínimo de chunks de distância que o jogador deve estar para manter a pilha ativa.
+    chunk: 5
+
+  # Drops personalizados por tipo de mob.
+  # Os mobs não listados aqui usarão o sistema padrão de drops do Minecraft.
+  per_mob:
+    cow:
+      # Define a quantidade de exp que o mob irá dar.
+      # '-1' para default do minecraft
+      exp: 0.5
+      drops:
+        drop1:
+          # Selecione o tipo do drop que irá ter:
+          # ITEM = dropará um item do minecraft.
+          # COMMAND = irá gerar um comando via console.
+          drop_type: "ITEM"
+
+          # Insira o material pelo nome padrão do minecraft.
+          material: "LEATHER"
+
+          # Coloque a chance de dropar o item ou executar o comando.
+          chance: 100
+
+          # Caso o jogador ganhar o item, ele terá um delay para ganhar novamente (em segundos)
+          # Coloque '0' para desativar.
+          delay: 0
+
+          # Coloque a quantidade mínima de dropar o item ou executar o comando.
+          min: 0
+
+          # Coloque a quantidade máximo de dropar o item ou executar o comando.
+          max: 2
+
+          # Define a variação POSITIVA no drop.
+          # Exemplo: Se positive_noise = 10, pode haver até +10% de variação no drop.
+          # Valor padrão: 10%
+          positive_noise: 10
+
+          # Define a variação NEGATIVA no drop.
+          # Exemplo: Se negative_noise = 10, pode haver até -10% de variação no drop.
+          # Valor padrão: 10%
+          negative_noise: 10
+
+          # Define a porcentagem do multiplicador da looting que o jogador estiver utilizando por nível.
+          # Exemplo: Looting 3 * 5% = 15% bônus de looting.
+          # Valor Padrão: 5%
+          looting: 5
+
+        drop2:
+          # Selecione o tipo do drop que irá ter:
+          # ITEM = dropará um item do minecraft.
+          # COMMAND = irá gerar um comando via console.
+          drop_type: "ITEM"
+
+          # Insira o material pelo nome padrão do minecraft.
+          material: "STONE"
+
+          # Selecione a data do item.
+          data: 1
+
+          # Coloque a chance em % de dropar o item ou executar o comando.
+          chance: 10
+
+          # Caso o jogador ganhar o item, ele terá um delay para ganhar novamente
+          # 20 tickspeed = 1 segundo.
+          # Coloque '0' para desativar.
+          delay: 0
+
+          # Coloque a quantidade mínima de dropar o item ou executar o comando.
+          min: 0
+
+          # Coloque a quantidade máximo de dropar o item ou executar o comando.
+          max: 5
+
+          # Define a variação POSITIVA no drop.
+          # Exemplo: Se positive_noise = 10, pode haver até +10% de variação no drop.
+          # Valor padrão: 10%
+          positive_noise: 10
+
+          # Define a variação NEGATIVA no drop.
+          # Exemplo: Se negative_noise = 10, pode haver até -10% de variação no drop.
+          # Valor padrão: 10%
+          negative_noise: 10
+
+          # Define a porcentagem do multiplicador da looting que o jogador estiver utilizando por nível.
+          # Exemplo: Looting 3 * 5% = 15% bônus de looting.
+          # Valor Padrão: 5%
+          looting: 5
+
+        drop3:
+          drop_type: "COMMAND"
+
+          # Coloque os comandos que deseja executar.
+          commands:
+            - "givespawner @player COW 1"
+            - "givecash @player 100k"
+
+          # Coloque a chance em % de dropar o item ou executar o comando.
+          chance: 10
+
+          # Caso o jogador ganhar o item, ele terá um delay para ganhar novamente
+          # 20 tickspeed = 1 segundo.
+          # Coloque '0' para desativar.
+          delay: 0
