@@ -1,10 +1,10 @@
 package com.github.theprogmatheus.mc.plugin.spawnerx.service;
 
-import co.aikar.commands.BaseCommand;
 import co.aikar.commands.Locales;
 import co.aikar.commands.PaperCommandManager;
 import com.github.theprogmatheus.mc.plugin.spawnerx.SpawnerX;
-import com.github.theprogmatheus.mc.plugin.spawnerx.command.TemplateCommand;
+import com.github.theprogmatheus.mc.plugin.spawnerx.command.AbstractCommand;
+import com.github.theprogmatheus.mc.plugin.spawnerx.command.SpawnerXCommand;
 import com.github.theprogmatheus.mc.plugin.spawnerx.config.env.Config;
 import com.github.theprogmatheus.mc.plugin.spawnerx.lib.Injector;
 import com.github.theprogmatheus.mc.plugin.spawnerx.lib.PluginService;
@@ -29,7 +29,7 @@ public class CommandService extends PluginService {
      * Register your commands here
      */
     private void registerAllCommands() {
-        registerCommand(TemplateCommand.class);
+        registerCommand(SpawnerXCommand.class);
     }
 
     private void unregisterAllCommands() {
@@ -57,7 +57,10 @@ public class CommandService extends PluginService {
         unregisterAllCommands();
     }
 
-    private void registerCommand(Class<? extends BaseCommand> commandClass) {
-        this.commandManager.registerCommand(this.injector.getInstance(commandClass));
+    private void registerCommand(Class<? extends AbstractCommand> commandClass) {
+        AbstractCommand command = this.injector.getInstance(commandClass);
+        command.resolveContexts(this.commandManager.getCommandContexts());
+        command.resolveConditions(this.commandManager.getCommandConditions());
+        this.commandManager.registerCommand(command);
     }
 }

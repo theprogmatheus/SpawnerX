@@ -19,9 +19,7 @@ val pluginDependencies = listOf(
     "net.gmcbm.dependencies:acf-paper:0.5.2",
     "com.j256.ormlite:ormlite-jdbc:6.1",
     "com.zaxxer:HikariCP:6.1.0",
-    "com.h2database:h2:2.3.232",
-    "org.mongodb:mongodb-driver-sync:5.5.1",
-    "dev.morphia.morphia:morphia-core:2.5.0"
+    "com.h2database:h2:2.3.232"
 )// Repository: https://repo.papermc.io/
 val supportsLibraries = true
 
@@ -32,11 +30,17 @@ repositories {
         url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
     }
     maven { url = uri("https://repo.papermc.io/repository/maven-public/") }
+    maven { url = uri("https://jitpack.io") }
 }
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20-R0.1-SNAPSHOT")
     compileOnly("org.projectlombok:lombok:1.18.38")
+    compileOnly("org.jetbrains:annotations:24.1.0")
+
+    implementation("com.github.theprogmatheus:JGR-UChecker:1.0.0") {
+        isTransitive = false;
+    }
 
     annotationProcessor("org.projectlombok:lombok:1.18.38")
 
@@ -81,6 +85,8 @@ tasks {
     shadowJar {
         dependsOn(test)
         mustRunAfter(test)
+
+        relocate("com.github.theprogmatheus.util", "${pluginPackage}.util")
     }
 
     test {
