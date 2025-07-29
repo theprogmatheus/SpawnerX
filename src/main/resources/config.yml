@@ -77,6 +77,9 @@ mobs:
   # Se habilitado, faz com que utilizando shift mate o mob de 1 em 1.
   shift_kill_one: false
 
+  # Se deve matar todos os mobs estacados de uma vez.
+  kill_all: false
+
   # Configurações de otimização de desempenho.
   performance_mob:
     # Remove a pilha de mobs se não houver nenhum jogador nas redondezas.
