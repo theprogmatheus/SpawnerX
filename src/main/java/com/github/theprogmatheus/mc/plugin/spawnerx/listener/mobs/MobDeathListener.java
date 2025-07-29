@@ -1,5 +1,6 @@
 package com.github.theprogmatheus.mc.plugin.spawnerx.listener.mobs;
 
+import com.github.theprogmatheus.mc.plugin.spawnerx.domain.MobConfig;
 import com.github.theprogmatheus.mc.plugin.spawnerx.domain.MobEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Projectile;
@@ -42,11 +43,10 @@ public class MobDeathListener implements Listener {
             mobEntityOptional = MobEntity.fromFakeEntity(entity);
 
         mobEntityOptional.ifPresent(mob -> {
-            var spawnerBlock = mob.getSpawnerBlock();
-            if (spawnerBlock == null)
+            var mobConfig = MobConfig.getConfig(entity.getType());
+            if (mobConfig == null)
                 return;
 
-            var mobConfig = spawnerBlock.getConfig().getMobConfig();
             var drops = mobConfig.getDrops();
             var exp = mobConfig.getDropExp();
             var killer = entity.getKiller();
