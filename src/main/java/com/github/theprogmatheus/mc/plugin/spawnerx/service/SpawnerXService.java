@@ -1,6 +1,7 @@
 package com.github.theprogmatheus.mc.plugin.spawnerx.service;
 
 import com.github.theprogmatheus.mc.plugin.spawnerx.SpawnerX;
+import com.github.theprogmatheus.mc.plugin.spawnerx.database.entity.SpawnerBlockEntity;
 import com.github.theprogmatheus.mc.plugin.spawnerx.database.mappers.SpawnerBlockMapper;
 import com.github.theprogmatheus.mc.plugin.spawnerx.database.repository.SpawnerBlockRepository;
 import com.github.theprogmatheus.mc.plugin.spawnerx.domain.MobConfig;
@@ -17,6 +18,7 @@ import org.bukkit.scheduler.BukkitTask;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -78,6 +80,12 @@ public class SpawnerXService extends PluginService {
                     this.spawnerBlockRepository.callBatchTasks(() -> {
                         for (var spawner : link.get().values()) {
                             var spawnerEntity = spawnerBlockMapper.mapFrom(spawner);
+
+
+                            List<SpawnerBlockEntity> existsList = this.spawnerBlockRepository.queryForEq("location", spawner.getOriginal());
+                            if (!existsList.isEmpty())
+                                spawnerEntity.setId(existsList.get(0).getId());
+
                             var result = this.spawnerBlockRepository.createOrUpdate(spawnerEntity);
                             if (result.isCreated())
                                 spawner.setDbId(spawnerEntity.getId());

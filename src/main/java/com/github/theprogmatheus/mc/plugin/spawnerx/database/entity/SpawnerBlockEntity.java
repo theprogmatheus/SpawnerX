@@ -1,6 +1,6 @@
 package com.github.theprogmatheus.mc.plugin.spawnerx.database.entity;
 
-import com.github.theprogmatheus.mc.plugin.spawnerx.database.converter.SimpleObjectJSONPersister;
+import com.github.theprogmatheus.mc.plugin.spawnerx.database.converter.LocationKeyPersister;
 import com.github.theprogmatheus.mc.plugin.spawnerx.domain.BlockLocationKey;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
@@ -20,6 +20,6 @@ public class SpawnerBlockEntity {
     @DatabaseField(canBeNull = false)
     private String config;
 
-    @DatabaseField(canBeNull = false, persisterClass = SimpleObjectJSONPersister.class, unique = true)
+    @DatabaseField(canBeNull = false, persisterClass = LocationKeyPersister.class, unique = true, index = true)
     private BlockLocationKey location;
 }
