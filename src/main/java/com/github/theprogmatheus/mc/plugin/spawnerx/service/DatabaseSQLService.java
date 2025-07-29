@@ -1,7 +1,7 @@
 package com.github.theprogmatheus.mc.plugin.spawnerx.service;
 
 import com.github.theprogmatheus.mc.plugin.spawnerx.SpawnerX;
-import com.github.theprogmatheus.mc.plugin.spawnerx.database.sql.DatabaseSQLManager;
+import com.github.theprogmatheus.mc.plugin.spawnerx.database.DatabaseSQLManager;
 import com.github.theprogmatheus.mc.plugin.spawnerx.lib.Injector;
 import com.github.theprogmatheus.mc.plugin.spawnerx.lib.PluginService;
 import com.zaxxer.hikari.HikariConfig;
