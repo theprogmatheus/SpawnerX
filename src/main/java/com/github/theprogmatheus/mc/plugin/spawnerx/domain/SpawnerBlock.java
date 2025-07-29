@@ -1,22 +1,31 @@
 package com.github.theprogmatheus.mc.plugin.spawnerx.domain;
 
+import com.github.theprogmatheus.mc.plugin.spawnerx.kdtree.KDNode;
+import com.github.theprogmatheus.mc.plugin.spawnerx.kdtree.KDTree;
 import com.github.theprogmatheus.mc.plugin.spawnerx.util.LinkedObject;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 @Getter
 @Setter
 public class SpawnerBlock extends LinkedObject<BlockLocationKey> {
+
+    private static final Map<String, KDTree<SpawnerBlock>> kdTrees = new ConcurrentHashMap<>();
 
     private transient Long dbId;
     private final transient SpawnerBlockConfig config;
@@ -39,11 +48,35 @@ public class SpawnerBlock extends LinkedObject<BlockLocationKey> {
     public LinkedObject<BlockLocationKey> link() {
         if (!super.hasLinked()) {
             super.link();
-
             if (getBlock().getState() instanceof CreatureSpawner creatureSpawner)
                 this.config.updateCreatureSpawner(creatureSpawner);
+
+            addToKdTree();
         }
         return this;
+    }
+
+    @Override
+    public void unlink() {
+        if (this.hasLinked()) {
+            super.unlink();
+            removeFromKdTree();
+        }
+    }
+
+    private void addToKdTree() {
+        var loc = getOriginal().toBukkitLocation();
+        var world = loc.getWorld();
+        if (world != null)
+            getKdTree(world).insert(new KDNode<>(loc, this, null, null));
+    }
+
+
+    private void removeFromKdTree() {
+        var loc = getOriginal().toBukkitLocation();
+        var world = loc.getWorld();
+        if (world != null)
+            getKdTree(world).remove(loc);
     }
 
     public Optional<MobEntity> findNearbyEntityOfType(@NotNull Location loc, double radius) {
@@ -90,6 +123,25 @@ public class SpawnerBlock extends LinkedObject<BlockLocationKey> {
 
     public static boolean isValidBukkitSpawnerBlock(@NotNull Block block) {
         return block.getState() instanceof CreatureSpawner;
+    }
+
+    public static KDTree<SpawnerBlock> getKdTree(@NotNull World world) {
+        return kdTrees.computeIfAbsent(world.getName(), worldName -> new KDTree<>());
+    }
+
+    public static List<SpawnerBlock> findNearbySpawners(@NotNull Location location, int radius) {
+        if (radius <= 0)
+            return Collections.emptyList();
+
+        var world = location.getWorld();
+        if (world == null)
+            return Collections.emptyList();
+
+        return getKdTree(location.getWorld())
+                .rangeSearch(location, radius)
+                .stream()
+                .map(KDNode::getValue)
+                .toList();
     }
 
 }

@@ -14,6 +14,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
@@ -111,7 +112,37 @@ public class MobEntity extends LinkedObject<UUID> {
         return fakeEntity;
     }
 
+    public int calculateUnstackAmount(@NotNull LivingEntity killer) {
+        if (getConfig().isShiftKillOne() && killer instanceof Player player && player.isSneaking())
+            return 1;
+
+        if (getConfig().isKillAll())
+            return this.stackedAmount;
+
+        var calculatedAmount = countNearbySpawners(getEntity().getLocation()) * getConfig().getKillUnstackAmountPerSpawner();
+        if (calculatedAmount <= 0)
+            calculatedAmount = 1;
+
+        return Math.min(calculatedAmount, this.stackedAmount);
+    }
+
+    private int countNearbySpawners(@NotNull Location location) {
+        return (int) SpawnerBlock.findNearbySpawners(location, 10)
+                .stream()
+                .filter(spawnerBlock -> getConfig().equals(spawnerBlock.getConfig().getMobConfig()))
+                .count();
+    }
+
+    public void simulateDeath(@NotNull LivingEntity killer) {
+        this.simulateDeath(killer, calculateUnstackAmount(killer));
+    }
+
     public void simulateDeath(@NotNull LivingEntity killer, int amount) {
+        if (amount <= 0)
+            return;
+
+        amount = Math.min(amount, this.stackedAmount);
+
         this.unstack(amount);
         if (this.stackedAmount > 0) {
             var entity = getEntity();
@@ -160,6 +191,8 @@ public class MobEntity extends LinkedObject<UUID> {
         if (config == null)
             throw new IllegalArgumentException("A loaded config was not found for this entity type: %s".formatted(entity.getType()));
 
+        // setup config
+        entity.setAI(config.isAi());
 
         var dataContainer = entity.getPersistentDataContainer();
 
@@ -172,8 +205,6 @@ public class MobEntity extends LinkedObject<UUID> {
         mobEntity.stackedAmount = deserializedData.stackedAmount;
         mobEntity.spawner = deserializedData.spawner;
 
-        // setup config
-        entity.setAI(config.isAi());
         return mobEntity.setup();
     }
 
