@@ -78,10 +78,12 @@ public class MobDropper {
             min = item.getMin();
             max = item.getMax();
         }
-
+        double negativeNoise = (0 - drop.getNegativeNoise());
+        double positiveNoise = drop.getPositiveNoise();
         double expectedPerDrop = (min + rand.nextInt(max - min + 1)) * dropChance;
         double expected = amount * expectedPerDrop;
-        expected *= 1.0 + rand.nextDouble(-drop.getNegativeNoise(), drop.getPositiveNoise());
+        if (positiveNoise > negativeNoise)
+            expected *= 1.0 + rand.nextDouble(negativeNoise, positiveNoise);
 
         var result = (long) expected;
         if (rand.nextDouble() < (expected % 1))

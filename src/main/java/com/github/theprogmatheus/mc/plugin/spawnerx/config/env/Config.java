@@ -55,6 +55,8 @@ public class Config {
             new ConfigurationHolder<>("mobs.knockback_mob", Boolean.class);
     public static final ConfigurationHolder<Boolean> MOBS_HITKILL_MOB =
             new ConfigurationHolder<>("mobs.hitkill_mob", Boolean.class);
+    public static final ConfigurationHolder<Boolean> MOBS_KILL_ALL =
+            new ConfigurationHolder<>("mobs.kill_all", Boolean.class);
     public static final ConfigurationHolder<Boolean> MOBS_SHIFT_KILL_ONE =
             new ConfigurationHolder<>("mobs.shift_kill_one", Boolean.class);
     public static final ConfigurationHolder<Boolean> MOBS_PERFORMANCE_MOB_STACK_KILL =

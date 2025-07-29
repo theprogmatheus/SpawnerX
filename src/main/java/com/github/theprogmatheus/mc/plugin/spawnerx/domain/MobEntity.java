@@ -116,7 +116,6 @@ public class MobEntity extends LinkedObject<UUID> {
             var fakeEntity = spawnFakeEntity();
             fakeEntity.damage(fakeEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue(), killer);
         }
-
         this.processMobDrops(killer, this.stackedAmount > 0 ? amount : this.stackedAmount + amount);
     }
 
@@ -127,9 +126,9 @@ public class MobEntity extends LinkedObject<UUID> {
     }
 
     public void processMobDrops(@NotNull LivingEntity killer, int amount) {
-        var spawner = getSpawnerBlock();
-        if (spawner != null)
-            MobDropper.dropAll(this, spawner.getConfig().getMobConfig(), killer, amount);
+        var config = MobConfig.getConfig(this.entity.getType());
+        if (config != null)
+            MobDropper.dropAll(this, config, killer, amount);
     }
 
     public MobEntity persist() {

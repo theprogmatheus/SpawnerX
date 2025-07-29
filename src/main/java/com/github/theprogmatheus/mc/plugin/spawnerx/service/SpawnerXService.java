@@ -4,7 +4,6 @@ import com.github.theprogmatheus.mc.plugin.spawnerx.SpawnerX;
 import com.github.theprogmatheus.mc.plugin.spawnerx.database.mappers.SpawnerBlockMapper;
 import com.github.theprogmatheus.mc.plugin.spawnerx.database.repository.SpawnerBlockRepository;
 import com.github.theprogmatheus.mc.plugin.spawnerx.domain.MobConfig;
-import com.github.theprogmatheus.mc.plugin.spawnerx.domain.MobEntity;
 import com.github.theprogmatheus.mc.plugin.spawnerx.domain.SpawnerBlock;
 import com.github.theprogmatheus.mc.plugin.spawnerx.domain.SpawnerBlockConfig;
 import com.github.theprogmatheus.mc.plugin.spawnerx.lib.Injector;
@@ -35,7 +34,7 @@ public class SpawnerXService extends PluginService {
 
     @Override
     public void startup() {
-        MobConfig.loadDefaults();
+        MobConfig.loadDefaults(this.plugin);
         SpawnerBlockConfig.loadDefaults(this.plugin);
 
         this.spawnerBlockRepository = this.injector.getInstance(SpawnerBlockRepository.class);
