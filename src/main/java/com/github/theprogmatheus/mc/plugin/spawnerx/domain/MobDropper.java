@@ -110,6 +110,9 @@ public class MobDropper {
 
 
     private static void runCommands(@NotNull MobDrop.MobDropCommand commandDrop, @NotNull LivingEntity killer, long amount, long dropAmount) {
+        if (dropAmount <= 0)
+            return;
+
         for (String command : commandDrop.getCommands()) {
             String parsed = command
                     .replace("%player%", killer.getName())
