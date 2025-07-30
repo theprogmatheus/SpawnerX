@@ -119,7 +119,7 @@ public class MobEntity extends LinkedObject<UUID> {
 
     private LivingEntity spawnFakeEntity() {
         var loc = getEntity().getLocation();
-        var fakeEntity = (LivingEntity) loc.getWorld().spawnEntity(loc, getEntity().getType());
+        var fakeEntity = (LivingEntity) loc.getWorld().spawnEntity(loc, getEntity().getType(), false);
         fakeEntity.getPersistentDataContainer()
                 .set(mobEntityRefNamespacedKey, PersistentDataType.STRING, getOriginal().toString());
         return fakeEntity;
