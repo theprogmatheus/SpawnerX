@@ -5,6 +5,7 @@ import com.github.theprogmatheus.mc.plugin.spawnerx.database.entity.SpawnerBlock
 import com.github.theprogmatheus.mc.plugin.spawnerx.database.mappers.SpawnerBlockMapper;
 import com.github.theprogmatheus.mc.plugin.spawnerx.database.repository.SpawnerBlockRepository;
 import com.github.theprogmatheus.mc.plugin.spawnerx.domain.MobConfig;
+import com.github.theprogmatheus.mc.plugin.spawnerx.domain.MobEntity;
 import com.github.theprogmatheus.mc.plugin.spawnerx.domain.SpawnerBlock;
 import com.github.theprogmatheus.mc.plugin.spawnerx.domain.SpawnerBlockConfig;
 import com.github.theprogmatheus.mc.plugin.spawnerx.lib.Injector;
@@ -44,6 +45,7 @@ public class SpawnerXService extends PluginService {
         this.autoSaveAndPurgeTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this.plugin, this::saveSpawnerBlocks, 20 * 300, 20 * 300);
 
         loadSpawnerBlocks();
+        MobEntity.loadAllPersisted();
     }
 
 

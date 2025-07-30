@@ -51,7 +51,7 @@ public class MobSpawnListener implements Listener {
 
 
     @EventHandler
-    void onChunkLoad(ChunkLoadEvent event) {
+    public void onChunkLoadEvent(ChunkLoadEvent event) {
         Arrays.stream(event.getChunk().getEntities())
                 .filter(entity -> (entity instanceof LivingEntity living)
                         && !living.isDead()
