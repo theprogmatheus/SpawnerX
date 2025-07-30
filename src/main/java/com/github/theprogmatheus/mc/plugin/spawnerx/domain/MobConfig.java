@@ -164,17 +164,13 @@ public class MobConfig extends LinkedObject<String> {
             var dropSection = allDropsSection.getConfigurationSection(dropKey);
             if (dropSection == null) continue;
 
-            System.out.println("dropKey=%s".formatted(dropKey));
             try {
                 MobDrop drop = parseDropSection(dropSection);
                 if (drop != null) drops.add(drop);
-                else
-                    System.out.println("Drop null ;-");
-            } catch (Exception ignored) {
-                ignored.printStackTrace();
+            } catch (Exception exception) {
+                exception.printStackTrace();
             }
         }
-        System.out.println(drops.size());
         config.setDrops(drops);
     }
 
