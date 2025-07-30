@@ -32,10 +32,12 @@ public class MobSpawnListener implements Listener {
 
         var spawnerBlock = spawnerLink.get();
         var mobEntity = spawnerBlock.findNearbyEntityOfType(event.getLocation(), 10);
-        if (mobEntity.isEmpty())
+        if (mobEntity.isEmpty()) {
+            event.setCancelled(true);
+            livingEntity = (LivingEntity) livingEntity.getWorld().spawnEntity(livingEntity.getLocation(), livingEntity.getType(), false);
             MobEntity.newMobEntity(livingEntity)
                     .setSpawner(spawnerBlock.getOriginal());
-        else {
+        } else {
             event.setCancelled(true);
             var mob = mobEntity.get();
             if (mob.getSpawnerBlock() == null) {
