@@ -11,26 +11,15 @@ import org.bukkit.event.block.EntityBlockFormEvent;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.vehicle.VehicleEntityCollisionEvent;
-import org.bukkit.event.world.StructureGrowEvent;
 import org.jetbrains.annotations.NotNull;
 import org.spigotmc.event.entity.EntityMountEvent;
 
 import java.util.function.Predicate;
 
-/**
- * This listener restricts unwanted vanilla behaviors for special MobEntity instances.
- * The goal is to ensure these entities act only as stacked mobs designed for death and loot drop.
- */
 public class MobEntityBehaviorController implements Listener {
 
-    /**
-     * Predicate to determine if an entity should be treated as a controlled MobEntity.
-     */
     private final @NotNull Predicate<Entity> isControlledMob;
 
-    /**
-     * Determines whether controlled mobs are allowed to attack or cause damage.
-     */
     private final boolean allowMobDamage;
 
     public MobEntityBehaviorController() {
@@ -77,7 +66,6 @@ public class MobEntityBehaviorController implements Listener {
 
     @EventHandler
     public void onBlockIgnite(BlockIgniteEvent event) {
-        // Cancel if source is a controlled mob
         if (event.getIgnitingEntity() != null && isControlledMob.test(event.getIgnitingEntity())) {
             event.setCancelled(true);
         }
@@ -106,12 +94,10 @@ public class MobEntityBehaviorController implements Listener {
 
     @EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent event) {
-        // Allow players to damage controlled mobs
         if (isControlledMob.test(event.getEntity()) && event.getDamager() instanceof Player) {
             return;
         }
 
-        // Prevent mobs from damaging others unless allowed
         if (event.getDamager() != null && isControlledMob.test(event.getDamager())) {
             if (!allowMobDamage) {
                 event.setCancelled(true);
@@ -122,7 +108,6 @@ public class MobEntityBehaviorController implements Listener {
     @EventHandler
     public void onCombustByEntity(EntityCombustByEntityEvent event) {
         if (isControlledMob.test(event.getEntity())) {
-            // Allow fire if the source is natural (lava, fire aspect, etc.)
             Entity combuster = event.getCombuster();
             if (!(combuster instanceof Player || combuster.getType().name().contains("PROJECTILE"))) {
                 event.setCancelled(true);
@@ -135,11 +120,6 @@ public class MobEntityBehaviorController implements Listener {
         if (isControlledMob.test(event.getEntity())) {
             event.setCancelled(true);
         }
-    }
-
-    @EventHandler
-    public void onStructureGrow(StructureGrowEvent event) {
-        // Optional: If structure growth is triggered by a mob (rare), you may want to check and cancel.
     }
 
     @EventHandler
@@ -190,6 +170,70 @@ public class MobEntityBehaviorController implements Listener {
     public void onEntityMount(EntityMountEvent event) {
         if (isControlledMob.test(event.getEntity()) || isControlledMob.test(event.getMount())) {
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onProjectileLaunch(ProjectileLaunchEvent event) {
+        if (!(event.getEntity().getShooter() instanceof Entity entity))
+            return;
+        if (isControlledMob.test(entity)) {
+            if (!allowMobDamage) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onProjectileHit(ProjectileHitEvent event) {
+        if (event.getEntity().getShooter() instanceof Entity shooter &&
+                isControlledMob.test(shooter) && !allowMobDamage) {
+            event.setCancelled(true);
+            event.getEntity().remove();
+        }
+    }
+
+    @EventHandler
+    public void onEntityShootBow(EntityShootBowEvent event) {
+        if (isControlledMob.test(event.getEntity()) && !allowMobDamage) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onCombustByBlock(EntityCombustByBlockEvent event) {
+        if (isControlledMob.test(event.getEntity())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onEntityCombust(EntityCombustEvent event) {
+        if (isControlledMob.test(event.getEntity())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onEntityDamageGeneric(EntityDamageEvent event) {
+        if (isControlledMob.test(event.getEntity()) && !(event instanceof EntityDamageByEntityEvent)) {
+            event.setCancelled(false);
+        }
+    }
+
+    @EventHandler
+    public void onEntityRegainHealth(EntityRegainHealthEvent event) {
+        if (isControlledMob.test(event.getEntity())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onCreatureSpawn(CreatureSpawnEvent event) {
+        if (isControlledMob.test(event.getEntity())) {
+            if (event.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL) {
+                event.setCancelled(true);
+            }
         }
     }
 }
