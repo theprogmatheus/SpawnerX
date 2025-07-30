@@ -15,6 +15,7 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -103,6 +104,32 @@ public class SpawnerBlock extends LinkedObject<BlockLocationKey> {
     @Override
     public boolean isBroken() {
         return !isOk();
+    }
+
+    public void handleMobSpawn(@NotNull SpawnerSpawnEvent event) {
+        if (!(event.getEntity() instanceof LivingEntity livingEntity))
+            return;
+
+        event.setCancelled(true);
+
+        var vehicle = livingEntity.getVehicle();
+        if (vehicle != null) {
+            vehicle.remove();
+            System.out.println("Entity vehicle removed: %s".formatted(vehicle));
+        }
+
+        var mobEntity = findNearbyEntityOfType(event.getLocation(), 10);
+        if (mobEntity.isEmpty()) {
+            livingEntity = (LivingEntity) livingEntity.getWorld().spawnEntity(livingEntity.getLocation(), livingEntity.getType(), false);
+            MobEntity.newMobEntity(livingEntity).setSpawner(getOriginal());
+        } else {
+            var mob = mobEntity.get();
+            if (mob.getSpawnerBlock() == null) {
+                mob.setSpawner(getOriginal());
+                mob.persist();
+            }
+            mob.stack();
+        }
     }
 
     public void handleBlockBreak(BlockBreakEvent event) {

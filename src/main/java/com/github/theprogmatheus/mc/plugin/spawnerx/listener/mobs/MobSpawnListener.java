@@ -19,36 +19,12 @@ public class MobSpawnListener implements Listener {
 
 
     @EventHandler(priority = EventPriority.MONITOR)
-    void onSpawn(SpawnerSpawnEvent event) {
+    public void onSpawn(SpawnerSpawnEvent event) {
         if (event.isCancelled())
             return;
-
-        if (!(event.getEntity() instanceof LivingEntity livingEntity))
-            return;
-
-        var spawnerLink = getLink(SpawnerBlock.class, BlockLocationKey.fromBukkitLocation(event.getSpawner().getLocation()));
-        if (spawnerLink.isEmpty())
-            return;
-
-        var spawnerBlock = spawnerLink.get();
-        var mobEntity = spawnerBlock.findNearbyEntityOfType(event.getLocation(), 10);
-        if (mobEntity.isEmpty()) {
-            event.setCancelled(true);
-            livingEntity = (LivingEntity) livingEntity.getWorld().spawnEntity(livingEntity.getLocation(), livingEntity.getType(), false);
-            MobEntity.newMobEntity(livingEntity)
-                    .setSpawner(spawnerBlock.getOriginal());
-        } else {
-            event.setCancelled(true);
-            var mob = mobEntity.get();
-            if (mob.getSpawnerBlock() == null) {
-                mob.setSpawner(spawnerBlock.getOriginal());
-                mob.persist();
-            }
-            mob.stack();
-        }
-
+        getLink(SpawnerBlock.class, BlockLocationKey.fromBukkitLocation(event.getSpawner().getLocation()))
+                .ifPresent(spawner -> spawner.handleMobSpawn(event));
     }
-
 
     @EventHandler
     public void onChunkLoadEvent(ChunkLoadEvent event) {
