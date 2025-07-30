@@ -22,7 +22,6 @@ public class MobDropper {
             return;
 
         var drops = config.getDrops();
-        var exp = config.getDropExp();
         var loc = entity.getEntity().getLocation();
 
         if (drops != null) {
@@ -35,6 +34,8 @@ public class MobDropper {
                     runCommands(command, killer, amount, (int) dropAmount);
             }
         }
+
+        int exp = config.getDropExp() * (int) amount;
         if (exp > 0)
             dropExp(killer, loc, exp);
     }
