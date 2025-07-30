@@ -1,6 +1,6 @@
 package com.github.theprogmatheus.mc.plugin.spawnerx.listener.mobs;
 
-import com.github.theprogmatheus.mc.plugin.spawnerx.domain.MobConfig;
+import com.github.theprogmatheus.mc.plugin.spawnerx.domain.MobDropper;
 import com.github.theprogmatheus.mc.plugin.spawnerx.domain.MobEntity;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
@@ -52,29 +52,12 @@ public class MobDeathListener implements Listener {
         var entity = event.getEntity();
         var mobEntityOptional = MobEntity.fromEntity(entity);
 
-        mobEntityOptional.ifPresent(MobEntity::unlink);
-
-        if (mobEntityOptional.isEmpty())
+        if (mobEntityOptional.isPresent())
+            mobEntityOptional.get().unlink();
+        else
             mobEntityOptional = MobEntity.fromFakeEntity(entity);
 
-        mobEntityOptional.ifPresent(mob -> {
-            var mobConfig = MobConfig.getConfig(entity.getType());
-            if (mobConfig == null)
-                return;
-
-            var drops = mobConfig.getDrops();
-            var exp = mobConfig.getDropExp();
-            var killer = entity.getKiller();
-
-            if (drops != null)
-                event.getDrops().clear();
-
-            if (exp >= 0 || killer != null) {
-                if (killer != null)
-                    killer.giveExp(event.getDroppedExp());
-                event.setDroppedExp(0);
-            }
-        });
+        mobEntityOptional.ifPresent(mob -> MobDropper.handleDefaultDrops(event, mob));
     }
 
 

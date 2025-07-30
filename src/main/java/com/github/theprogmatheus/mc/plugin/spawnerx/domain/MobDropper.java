@@ -6,6 +6,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.ExperienceOrb;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,6 +17,40 @@ import java.util.concurrent.ThreadLocalRandom;
 public class MobDropper {
 
     private static final ThreadLocalRandom rand = ThreadLocalRandom.current();
+
+
+    public static void handleDefaultDrops(@NotNull EntityDeathEvent event, @NotNull MobEntity mob) {
+        var entity = event.getEntity();
+        var mobConfig = mob.getConfig();
+
+        if (mobConfig.getDrops() != null)
+            event.getDrops().clear();
+
+        if (mobConfig.getDropExp() > 0)
+            event.setDroppedExp(0);
+
+
+        var amountUnstacked = mob.getLastUnstackAmount();
+        if (amountUnstacked <= 0)
+            return;
+
+        if (!event.getDrops().isEmpty() && amountUnstacked > 1) {
+            var drops = new ArrayList<>(event.getDrops());
+            event.getDrops().clear();
+            event.getDrops().addAll(multiplyDrops(drops, amountUnstacked));
+        }
+
+        var newExp = (event.getDroppedExp() * amountUnstacked);
+        if (newExp > 0) {
+            var killer = entity.getKiller();
+            if (killer == null)
+                event.setDroppedExp(newExp);
+            else {
+                killer.giveExp(newExp);
+                event.setDroppedExp(0);
+            }
+        }
+    }
 
     public static void dropAll(@NotNull MobEntity entity, @NotNull MobConfig config, @NotNull LivingEntity killer, long amount) {
         if (amount <= 0)
@@ -38,6 +73,14 @@ public class MobDropper {
         int exp = config.getDropExp() * (int) amount;
         if (exp > 0)
             dropExp(killer, loc, exp);
+    }
+
+    private static List<ItemStack> multiplyDrops(List<ItemStack> baseDrops, long multiplier) {
+        List<ItemStack> result = new ArrayList<>();
+        for (ItemStack drop : baseDrops)
+            result.addAll(splitIntoMaxStacks(drop, drop.getAmount() * multiplier));
+
+        return result;
     }
 
     private static void dropExp(@NotNull LivingEntity killer, @NotNull Location location, int exp) {
@@ -93,25 +136,34 @@ public class MobDropper {
         return Math.min(result, amount * max);
     }
 
+    private static List<ItemStack> splitIntoMaxStacks(@NotNull ItemStack original, long amount) {
+        if (amount <= 1)
+            return List.of(original);
+
+        List<ItemStack> items = new ArrayList<>();
+        ItemStack itemStack;
+        while (amount > Integer.MAX_VALUE) {
+            itemStack = original.clone();
+            itemStack.setAmount(Integer.MAX_VALUE);
+            items.add(itemStack);
+            amount -= Integer.MAX_VALUE;
+        }
+        itemStack = original.clone();
+        itemStack.setAmount((int) amount);
+        items.add(itemStack);
+        return items;
+    }
+
     private static void dropItem(@NotNull MobDrop.MobDropItem item, @NotNull Location location, long amountToDrop) {
         if (amountToDrop <= 0)
             return;
 
         var world = location.getWorld();
-        List<ItemStack> items = new ArrayList<>();
-        ItemStack itemStack;
-        while (amountToDrop > Integer.MAX_VALUE) {
-            itemStack = item.getItem().clone();
-            itemStack.setAmount(Integer.MAX_VALUE);
-            items.add(itemStack);
+        if (world == null)
+            return;
 
-            amountToDrop -= Integer.MAX_VALUE;
-        }
-        itemStack = item.getItem().clone();
-        itemStack.setAmount((int) amountToDrop);
-        items.add(itemStack);
-
-        items.forEach(itemToDrop -> world.dropItemNaturally(location, itemToDrop));
+        splitIntoMaxStacks(item.getItem(), amountToDrop)
+                .forEach(itemToDrop -> world.dropItemNaturally(location, itemToDrop));
     }
 
 

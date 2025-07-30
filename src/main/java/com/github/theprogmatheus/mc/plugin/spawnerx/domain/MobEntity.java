@@ -39,6 +39,7 @@ public class MobEntity extends LinkedObject<UUID> {
     private final transient MobConfig config;
 
     private int stackedAmount;
+    private int lastUnstackAmount;
     private BlockLocationKey spawner;
 
     MobEntity(@NotNull LivingEntity entity, @NotNull MobConfig config) {
@@ -111,7 +112,14 @@ public class MobEntity extends LinkedObject<UUID> {
     }
 
     public void unstack(int amount) {
+        if (amount < 1)
+            return;
+
+        amount = Math.min(amount, this.stackedAmount);
+
+        this.lastUnstackAmount = amount;
         this.stackedAmount -= amount;
+
         if (this.stackedAmount > 0)
             this.updateDisplayName();
         this.persist();
@@ -120,8 +128,9 @@ public class MobEntity extends LinkedObject<UUID> {
     private LivingEntity spawnFakeEntity() {
         var loc = getEntity().getLocation();
         var fakeEntity = (LivingEntity) loc.getWorld().spawnEntity(loc, getEntity().getType(), false);
-        fakeEntity.getPersistentDataContainer()
-                .set(mobEntityRefNamespacedKey, PersistentDataType.STRING, getOriginal().toString());
+        var dataContainer = fakeEntity.getPersistentDataContainer();
+
+        dataContainer.set(mobEntityRefNamespacedKey, PersistentDataType.STRING, getOriginal().toString());
         return fakeEntity;
     }
 
@@ -217,6 +226,7 @@ public class MobEntity extends LinkedObject<UUID> {
         var mobEntity = new MobEntity(entity, config);
         mobEntity.stackedAmount = deserializedData.stackedAmount;
         mobEntity.spawner = deserializedData.spawner;
+        mobEntity.lastUnstackAmount = deserializedData.lastUnstackAmount;
 
         return mobEntity.setup();
     }
