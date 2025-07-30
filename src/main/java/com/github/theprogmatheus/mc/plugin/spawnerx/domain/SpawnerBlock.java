@@ -126,8 +126,7 @@ public class SpawnerBlock extends LinkedObject<BlockLocationKey> {
         event.setExpToDrop(0);
 
         var item = this.config.createItemStack(1);
-
-        var availableSpace = InventoryUtils.getAvailableSpaceForItem(inventory.getContents(), item);
+        var availableSpace = InventoryUtils.getAvailableSpaceForItem(inventory.getStorageContents(), item);
         if (availableSpace > 0)
             inventory.addItem(item);
         else
