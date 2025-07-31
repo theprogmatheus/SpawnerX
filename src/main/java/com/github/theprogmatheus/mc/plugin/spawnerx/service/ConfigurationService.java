@@ -35,4 +35,8 @@ public class ConfigurationService extends PluginService {
         configureAllConfigs()
                 .mapConfigurationClasses();
     }
+
+    public void reload() {
+        this.configurationManager.mapConfigurationClasses();
+    }
 }

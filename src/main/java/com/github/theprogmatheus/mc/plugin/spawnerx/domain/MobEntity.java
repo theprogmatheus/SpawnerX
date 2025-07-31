@@ -173,7 +173,7 @@ public class MobEntity extends LinkedObject<UUID> {
             var fakeEntity = spawnFakeEntity();
             fakeEntity.damage(Double.MAX_VALUE, killer);
         }
-        MobDropper.dropAll(this, this.config, killer, amount);
+        MobDropper.dropAll(this, getConfig(), killer, amount);
     }
 
     public SpawnerBlock getSpawnerBlock() {
@@ -214,7 +214,7 @@ public class MobEntity extends LinkedObject<UUID> {
             throw new IllegalArgumentException("A loaded config was not found for this entity type: %s".formatted(entity.getType()));
 
         // setup config
-        entity.setAI(config.isAi());
+        config.applyToEntity(entity);
 
         var dataContainer = entity.getPersistentDataContainer();
 

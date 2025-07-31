@@ -112,11 +112,10 @@ public class SpawnerBlock extends LinkedObject<BlockLocationKey> {
 
         event.setCancelled(true);
 
+        // prevent jockeys
         var vehicle = livingEntity.getVehicle();
-        if (vehicle != null) {
+        if (vehicle != null)
             vehicle.remove();
-            System.out.println("Entity vehicle removed: %s".formatted(vehicle));
-        }
 
         var mobEntity = findNearbyEntityOfType(event.getLocation(), 10);
         if (mobEntity.isEmpty()) {

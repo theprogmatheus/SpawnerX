@@ -9,6 +9,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -94,7 +95,12 @@ public class MobConfig extends LinkedObject<String> {
     public static void loadDefaults(@NotNull Plugin plugin) {
         Arrays.stream(EntityType.values())
                 .filter(EntityType::isAlive)
-                .forEach(entityType -> applyDefaultConfig(new MobConfig(entityType.name(), entityType)).link());
+                .forEach(entityType -> {
+                    var config = LinkedObject.getLink(MobConfig.class, entityType.name()).orElse(new MobConfig(entityType.name(), entityType));
+                    if (!config.hasLinked())
+                        config.link();
+                    applyDefaultConfig(config);
+                });
 
         applyYamlConfigs(plugin.getLogger());
     }
@@ -221,6 +227,11 @@ public class MobConfig extends LinkedObject<String> {
             item.setItemMeta(meta);
         }
         return item;
+    }
+
+    public MobConfig applyToEntity(@NotNull LivingEntity entity) {
+        entity.setAI(this.ai);
+        return this;
     }
 
 }

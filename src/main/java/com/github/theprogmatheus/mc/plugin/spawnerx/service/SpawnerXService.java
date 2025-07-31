@@ -30,6 +30,7 @@ public class SpawnerXService extends PluginService {
     private final transient Injector injector;
     private final transient SpawnerX plugin;
     private final transient Logger log;
+    private final transient ConfigurationService configurationService;
 
     private SpawnerBlockRepository spawnerBlockRepository;
     private SpawnerBlockMapper spawnerBlockMapper;
@@ -56,6 +57,26 @@ public class SpawnerXService extends PluginService {
 
         saveSpawnerBlocks();
         purgeSpawnerBlocks();
+    }
+
+
+    public void reloadSpawnerBlocks() {
+        ExecutorTimeLogger.executeAndLogTime(this.log, "Reload SpawnerBlockConfig's", () -> {
+            this.configurationService.reload();
+            // TODO
+        });
+    }
+
+    public void reloadMobEntities() {
+        ExecutorTimeLogger.executeAndLogTime(this.log, "Reload MobConfig's", () -> {
+            this.configurationService.reload();
+            MobConfig.loadDefaults(this.plugin);
+            LinkedObject.getLinkerMap(MobEntity.class).ifPresent(map -> map.values().forEach(mob -> {
+                if (mob.isBroken())
+                    return;
+                mob.getConfig().applyToEntity(mob.getEntity());
+            }));
+        });
     }
 
     public void loadSpawnerBlocks() {
