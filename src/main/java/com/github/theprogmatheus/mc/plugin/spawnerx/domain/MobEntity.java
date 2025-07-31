@@ -173,7 +173,7 @@ public class MobEntity extends LinkedObject<UUID> {
             entity.setHealth(entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue());
 
             var fakeEntity = spawnFakeEntity();
-            fakeEntity.damage(Double.MAX_VALUE, killer);
+            fakeEntity.damage(fakeEntity.getHealth() * 2, killer);
         }
         MobDropper.dropAll(this, getConfig(), killer, amount);
     }
