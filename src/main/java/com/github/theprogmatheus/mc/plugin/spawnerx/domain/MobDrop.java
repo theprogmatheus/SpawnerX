@@ -11,7 +11,7 @@ public abstract class MobDrop {
 
     private double chance = 1.0;
     private double positiveNoise = 0.15;
-    private double negativeNoise = 0.25;
+    private double negativeNoise = 0.15;
     private long delay = 0;
 
     @Data

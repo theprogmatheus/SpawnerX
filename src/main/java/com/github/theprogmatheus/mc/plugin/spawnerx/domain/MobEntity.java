@@ -14,11 +14,13 @@ import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataType;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -233,12 +235,19 @@ public class MobEntity extends LinkedObject<UUID> {
 
     public static void loadAllPersisted() {
         ExecutorTimeLogger.executeAndLogTime(SpawnerX.getInjector().getInstance(Logger.class),
-                "Load MobEntities", () -> Bukkit.getWorlds()
+                "Load MobEntities", () -> loadPersisted(Bukkit.getWorlds()
                         .stream()
                         .map(World::getEntities)
-                        .flatMap(List::stream)
-                        .filter(entity -> (entity instanceof LivingEntity livingEntity) && hasMobEntityData(livingEntity))
-                        .forEach(entity -> newMobEntity((LivingEntity) entity)));
+                        .flatMap(List::stream).toList()));
+    }
+
+    public static void loadPersisted(@NotNull Collection<Entity> entities) {
+        entities.stream()
+                .filter(entity -> (entity instanceof LivingEntity living)
+                        && !living.isDead()
+                        && MobEntity.hasMobEntityData(living)
+                        && LinkedObject.getLink(MobEntity.class, living.getUniqueId()).isEmpty())
+                .forEach(entity -> MobEntity.newMobEntity((LivingEntity) entity));
     }
 
 
