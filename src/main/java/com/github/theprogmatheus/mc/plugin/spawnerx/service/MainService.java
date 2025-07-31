@@ -30,6 +30,7 @@ public class MainService extends PluginService {
         addService(ListenerService.class);
         addService(APIService.class);
         addService(UpdateCheckerService.class);
+        addService(PlayerProfileService.class);
         addService(SpawnerXService.class, -10, 10);
     }
 
