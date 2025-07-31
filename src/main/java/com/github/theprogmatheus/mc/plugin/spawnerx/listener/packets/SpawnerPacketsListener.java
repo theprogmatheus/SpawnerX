@@ -11,6 +11,7 @@ import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBlockEntityData;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData;
 import com.github.theprogmatheus.mc.plugin.spawnerx.domain.BlockLocationKey;
+import com.github.theprogmatheus.mc.plugin.spawnerx.domain.PlayerProfile;
 import com.github.theprogmatheus.mc.plugin.spawnerx.domain.SpawnerBlock;
 import com.github.theprogmatheus.mc.plugin.spawnerx.util.LinkedObject;
 import lombok.RequiredArgsConstructor;
@@ -63,7 +64,7 @@ public class SpawnerPacketsListener extends PacketListenerAbstract {
         Vector3i position = packet.getPosition();
         BlockLocationKey blockLocationKey = new BlockLocationKey(player.getWorld().getName(), position.getX(), position.getY(), position.getZ());
         LinkedObject.getLink(SpawnerBlock.class, blockLocationKey).ifPresent(spawner -> {
-            if (!spawner.getConfig().isAnimatedSpawner())
+            if (!isAnimatedSpawner(player))
                 event.setCancelled(true);
         });
     }
@@ -89,9 +90,14 @@ public class SpawnerPacketsListener extends PacketListenerAbstract {
                                 BlockLocationKey.fromBukkitLocation(blockState.getLocation())
                         ).orElse(null);
 
-                        if (spawner != null && !spawner.getConfig().isAnimatedSpawner())
+                        if (spawner != null && !isAnimatedSpawner(player))
                             spawner.hideSpawnerAnimation(player);
                     });
         });
+    }
+
+    private boolean isAnimatedSpawner(@NotNull Player player) {
+        var profile = PlayerProfile.fromPlayer(player);
+        return profile.getPlayerData().isAnimatedSpawners();
     }
 }
