@@ -14,15 +14,20 @@ lang:
 
 # =====================[ CONFIGURAÇÕES DE SPAWNERS ]===================== #
 spawners:
+  item:
+    name: "&6Gerador de Monstros"
+    lore:
+      - ""
+      - "&7Tipo: &f%display_name%"
   # Exibe um holograma acima do spawner (apenas se o empilhamento de spawners estiver ativo).
   hologram: false
 
   # Formato das linhas do holograma. Use variáveis como:
   # %stack_spawner% = quantidade de spawners
   # %type_mob% = tipo de mob
-  format:
+  hologram_format:
     - "&6&lMOBSPAWNER"
-    - "&6%stack_spawner% &f%type_mob%"
+    - "&6%stack_spawner% &f%display_name%"
 
   # Configurações para empilhamento (stack) de spawners.
   stack:
@@ -40,6 +45,33 @@ spawners:
   # false = qualquer picareta
   only_silktouch: true
 
+  # Configuração
+  settings:
+    # Intervalo para a geração de mobs em ticks.
+    # 20 tickspeed = 1 segundo.
+    delay: 40
+
+    # Intervalo mínimo para a geração de um mob em ticks.
+    # 20 tickspeed = 1 segundo.
+    min_spawn_delay: 40
+
+    # Intervalo máximo para a geração de um mob em ticks.
+    # 20 tickspeed = 1 segundo.
+    max_spawn_delay: 100
+
+    # Número de mobs que o spawner tenta gerar a cada ciclo de spawn.
+    spawn_count: 4
+
+    # Define o raio (em blocos) em torno do spawner onde os mobs podem aparecer.
+    spawn_range: 5
+
+    # Distância máxima (em blocos) que um jogador precisa estar do spawner para que ele ative.
+    required_player_range: 10
+
+    # Número máximo de entidades vivas nas proximidades do spawner. Se houver mais que isso, o spawner pausa até que esse número caia.
+    # Isto só funcionará caso o stack de mobs esteja desativado.
+    max_nearby_entities: 16
+
 # =====================[ CONFIGURAÇÕES DE MOBS ]===================== #
 mobs:
   # Formato de exibição do nome da pilha de mobs.
@@ -51,19 +83,6 @@ mobs:
 
   # Quantos mobs devem morrer por cada spawner ativo na chunk ao abater a pilha.
   kill_stack_per_spawner: 1
-
-  # Tempo base (em segundos) para o spawner gerar mobs.
-  temp_spawn: 10
-
-  # Se verdadeiro, quanto mais spawners houver na chunk, menor será o tempo de spawn.
-  more_spawners_temp_reduction: true
-
-  # Redução no tempo de spawn (em ticks) por spawner adicional.
-  # 20 tickspeed = 1 segundo
-  temp_reduction: 10
-
-  # Tempo mínimo de spawn (em segundos), mesmo com milhares de spawners.
-  max_reduction: 3
 
   # Desativa a IA dos mobs empilhados (eles ficam imóveis).
   ai_mob: true
@@ -77,7 +96,7 @@ mobs:
   # Se habilitado, faz com que utilizando shift mate o mob de 1 em 1.
   shift_kill_one: false
 
-  # Se deve matar todos os mobs estacados de uma vez.
+  # Se habilitado, deve matar todos os mobs estacados de uma vez.
   kill_all: false
 
   # Configurações de otimização de desempenho.
@@ -92,9 +111,16 @@ mobs:
   # Os mobs não listados aqui usarão o sistema padrão de drops do Minecraft.
   per_mob:
     cow:
-      # Define a quantidade de exp que o mob irá dar.
+      # Define o nome de exibição do mob.
+      display_name: "Vaca"
+
+      # Define a quantidade de exp que o mob irá dar pelo mínimo e máximo.
       # '-1' para default do minecraft
-      exp: 0.5
+      experience:
+        # Experiência mínima que o jogador irá ganhar.
+        min: 1
+        # Experiência máxima que o jogador irá ganhar.
+        max: 3
       drops:
         drop1:
           # Selecione o tipo do drop que irá ter:
@@ -108,9 +134,17 @@ mobs:
           # Coloque a chance de dropar o item ou executar o comando.
           chance: 100
 
-          # Caso o jogador ganhar o item, ele terá um delay para ganhar novamente (em segundos)
+          # Sistema para controlar o ganho de itens raros por jogador e global.
           # Coloque '0' para desativar.
-          delay: 0
+          drop_controller:
+            # Defina o tempo em segundos para que o jogador entre em cooldown e só ganha o item após passar o tempo.
+            player_delay: 120
+
+            # Defina a quantidade máxima de itens que os jogadores podem conseguir no intervalo de tempo selecionado em 'global_delay'.
+            global_amount: 2
+
+            # Defina o tempo em segundos, caso a quantidade de itens selecionados em 'global_amount' for obtido para entrar em cooldown e ninguém ganhar mais.
+            global_delay: 1400
 
           # Coloque a quantidade mínima de dropar o item ou executar o comando.
           min: 0
@@ -141,9 +175,6 @@ mobs:
 
           # Insira o material pelo nome padrão do minecraft.
           material: "STONE"
-
-          # Selecione a data do item.
-          data: 1
 
           # Coloque a chance em % de dropar o item ou executar o comando.
           chance: 10
