@@ -12,6 +12,7 @@ import com.github.theprogmatheus.mc.plugin.spawnerx.lib.Injector;
 import com.github.theprogmatheus.mc.plugin.spawnerx.lib.PluginService;
 import com.github.theprogmatheus.mc.plugin.spawnerx.util.ExecutorTimeLogger;
 import com.github.theprogmatheus.mc.plugin.spawnerx.util.LinkedObject;
+import com.github.theprogmatheus.mc.plugin.spawnerx.util.PacketEventsUtils;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
@@ -38,15 +39,15 @@ public class SpawnerXService extends PluginService {
 
     @Override
     public void startup() {
-        MobConfig.loadDefaults(this.plugin);
-        SpawnerBlockConfig.loadDefaults(this.plugin);
-
         this.spawnerBlockRepository = this.injector.getInstance(SpawnerBlockRepository.class);
         this.spawnerBlockMapper = this.injector.getInstance(SpawnerBlockMapper.class);
         this.autoSaveAndPurgeTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this.plugin, this::saveSpawnerBlocks, 20 * 300, 20 * 300);
 
+        MobConfig.loadDefaults(this.plugin);
+        SpawnerBlockConfig.loadDefaults(this.plugin);
         loadSpawnerBlocks();
         MobEntity.loadAllPersisted();
+        loadPacketEvents();
     }
 
 
@@ -57,6 +58,19 @@ public class SpawnerXService extends PluginService {
 
         saveSpawnerBlocks();
         purgeSpawnerBlocks();
+        unloadPacketEvents();
+    }
+
+    public void loadPacketEvents() {
+        if (PacketEventsUtils.isPacketEventsAvailable())
+            com.github.theprogmatheus.mc.plugin.spawnerx.lib.
+                    PacketEventsProvider.init(this.plugin);
+    }
+
+    public void unloadPacketEvents() {
+        if (PacketEventsUtils.isPacketEventsAvailable())
+            com.github.theprogmatheus.mc.plugin.spawnerx.lib.
+                    PacketEventsProvider.terminate(this.plugin);
     }
 
 

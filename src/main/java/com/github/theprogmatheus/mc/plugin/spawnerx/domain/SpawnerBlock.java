@@ -5,6 +5,7 @@ import com.github.theprogmatheus.mc.plugin.spawnerx.kdtree.KDNode;
 import com.github.theprogmatheus.mc.plugin.spawnerx.kdtree.KDTree;
 import com.github.theprogmatheus.mc.plugin.spawnerx.util.InventoryUtils;
 import com.github.theprogmatheus.mc.plugin.spawnerx.util.LinkedObject;
+import com.github.theprogmatheus.mc.plugin.spawnerx.util.PacketEventsUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.GameMode;
@@ -14,6 +15,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.jetbrains.annotations.NotNull;
@@ -33,6 +35,7 @@ public class SpawnerBlock extends LinkedObject<BlockLocationKey> {
 
     private transient Long dbId;
     private final transient SpawnerBlockConfig config;
+    private boolean animated;
 
     public SpawnerBlock(@NotNull Block block, @NotNull SpawnerBlockConfig config) {
         super(BlockLocationKey.fromBukkitLocation(block.getLocation()));
@@ -183,4 +186,9 @@ public class SpawnerBlock extends LinkedObject<BlockLocationKey> {
                 .toList();
     }
 
+    public void hideSpawnerAnimation(@NotNull Player player) {
+        if (PacketEventsUtils.isPacketEventsAvailable())
+            com.github.theprogmatheus.mc.plugin.spawnerx.lib.PacketEventsProvider
+                    .hideSpawnerAnimation(player, this);
+    }
 }

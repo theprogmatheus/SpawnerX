@@ -31,10 +31,14 @@ repositories {
     }
     maven { url = uri("https://repo.papermc.io/repository/maven-public/") }
     maven { url = uri("https://jitpack.io") }
+    maven { url = uri("https://repo.codemc.io/repository/maven-releases/") }
+
 }
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20-R0.1-SNAPSHOT")
+    compileOnly("com.github.retrooper:packetevents-spigot:2.9.3");
+
     compileOnly("org.projectlombok:lombok:1.18.38")
     compileOnly("org.jetbrains:annotations:24.1.0")
 

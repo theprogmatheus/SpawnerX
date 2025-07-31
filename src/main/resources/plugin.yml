@@ -2,6 +2,7 @@ main: ${main}
 name: ${name}
 version: ${version}
 api-version: ${apiVersion}
+softdepend: [packetevents]
 authors:
   - ${authors}
 website: ${website}

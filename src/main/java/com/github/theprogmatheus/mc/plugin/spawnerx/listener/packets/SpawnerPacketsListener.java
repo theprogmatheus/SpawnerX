@@ -1,0 +1,62 @@
+package com.github.theprogmatheus.mc.plugin.spawnerx.listener.packets;
+
+import com.github.retrooper.packetevents.event.PacketListenerAbstract;
+import com.github.retrooper.packetevents.event.PacketSendEvent;
+import com.github.retrooper.packetevents.protocol.packettype.PacketType;
+import com.github.retrooper.packetevents.protocol.player.User;
+import com.github.retrooper.packetevents.protocol.world.chunk.Column;
+import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData;
+import com.github.theprogmatheus.mc.plugin.spawnerx.domain.BlockLocationKey;
+import com.github.theprogmatheus.mc.plugin.spawnerx.domain.SpawnerBlock;
+import com.github.theprogmatheus.mc.plugin.spawnerx.util.LinkedObject;
+import lombok.RequiredArgsConstructor;
+import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
+import org.bukkit.World;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.CreatureSpawner;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
+
+import java.util.Arrays;
+
+@RequiredArgsConstructor
+public class SpawnerPacketsListener extends PacketListenerAbstract {
+
+    private final Plugin plugin;
+
+    @Override
+    public void onPacketSend(PacketSendEvent event) {
+        if (!event.getPacketType().equals(PacketType.Play.Server.CHUNK_DATA))
+            return;
+
+        User user = event.getUser();
+        Player player = Bukkit.getPlayer(user.getUUID());
+        if (player == null)
+            return;
+        World world = player.getWorld();
+
+        WrapperPlayServerChunkData packet = new WrapperPlayServerChunkData(event);
+
+        Column column = packet.getColumn();
+        Chunk chunk = world.getChunkAt(column.getX(), column.getZ());
+
+        Bukkit.getScheduler().runTask(plugin, () -> {
+
+            BlockState[] tileEntities = chunk.getTileEntities();
+            if (tileEntities.length == 0)
+                return;
+            Arrays.stream(tileEntities)
+                    .filter(CreatureSpawner.class::isInstance)
+                    .forEach(blockState -> {
+                        SpawnerBlock spawner = LinkedObject.getLink(
+                                SpawnerBlock.class,
+                                BlockLocationKey.fromBukkitLocation(blockState.getLocation())
+                        ).orElse(null);
+
+                        if (spawner != null && !spawner.isAnimated())
+                            spawner.hideSpawnerAnimation(player);
+                    });
+        });
+    }
+}
