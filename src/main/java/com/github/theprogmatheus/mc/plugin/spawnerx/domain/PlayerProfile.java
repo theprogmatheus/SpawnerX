@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -22,6 +23,12 @@ public class PlayerProfile extends LinkedObject<UUID> {
     public PlayerProfile(@NotNull PlayerData playerData) {
         super(playerData.getId());
         this.playerData = playerData;
+    }
+
+    public static PlayerProfile fromPlayer(@NotNull Player player) {
+        return LinkedObject.getLink(PlayerProfile.class, player.getUniqueId())
+                .orElseGet(() -> (PlayerProfile) new PlayerProfile(new PlayerData(player.getUniqueId())).link());
+
     }
 
 }

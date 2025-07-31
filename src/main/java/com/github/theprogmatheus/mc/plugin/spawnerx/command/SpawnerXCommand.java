@@ -2,12 +2,15 @@ package com.github.theprogmatheus.mc.plugin.spawnerx.command;
 
 import co.aikar.commands.PaperCommandManager;
 import co.aikar.commands.annotation.*;
+import com.github.theprogmatheus.mc.plugin.spawnerx.domain.PlayerData;
+import com.github.theprogmatheus.mc.plugin.spawnerx.domain.PlayerProfile;
 import com.github.theprogmatheus.mc.plugin.spawnerx.domain.SpawnerBlockConfig;
 import com.github.theprogmatheus.mc.plugin.spawnerx.service.SpawnerXService;
 import com.github.theprogmatheus.mc.plugin.spawnerx.util.LinkedObject;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -75,6 +78,22 @@ public class SpawnerXCommand extends AbstractCommand {
     }
 
 
+    @Subcommand("toggle")
+    @CommandCompletion("@available_toogles")
+    @CommandPermission("spawnerx.cmd.toggle")
+    public void onToggleCommand(Player player, @Name("setting") String setting) {
+        PlayerProfile profile = PlayerProfile.fromPlayer(player);
+        PlayerData data = profile.getPlayerData();
+
+        if ("spawners_animation".equalsIgnoreCase(setting)) {
+            data.setAnimatedSpawners(!data.isAnimatedSpawners());
+            player.sendMessage("§eA animação dos spawners foi %s §ecom sucesso.".formatted(data.isAnimatedSpawners() ? "§ahabilitada" : "§cdesabilitada"));
+        } else {
+            player.sendMessage("§cConfiguração não encontrada.");
+        }
+    }
+
+
     private void resolveContexts(PaperCommandManager commandManager) {
         var commandContexts = commandManager.getCommandContexts();
 
@@ -92,6 +111,7 @@ public class SpawnerXCommand extends AbstractCommand {
                         .toList());
 
         completions.registerAsyncCompletion("reload_modules", context -> List.of("spawners", "mobs"));
+        completions.registerAsyncCompletion("available_toogles", context -> List.of("spawners_animation"));
     }
 
 
