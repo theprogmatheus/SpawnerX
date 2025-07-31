@@ -30,7 +30,7 @@ public class SpawnerBlockConfig extends LinkedObject<String> {
 
     private final String id;
     private final MobConfig mobConfig;
-
+    private boolean animatedSpawner;
     private int delay = 20;
     private int minSpawnDelay = 40;
     private int maxSpawnDelay = 100;

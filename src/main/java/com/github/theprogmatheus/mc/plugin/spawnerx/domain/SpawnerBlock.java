@@ -35,7 +35,6 @@ public class SpawnerBlock extends LinkedObject<BlockLocationKey> {
 
     private transient Long dbId;
     private final transient SpawnerBlockConfig config;
-    private boolean animated;
 
     public SpawnerBlock(@NotNull Block block, @NotNull SpawnerBlockConfig config) {
         super(BlockLocationKey.fromBukkitLocation(block.getLocation()));
