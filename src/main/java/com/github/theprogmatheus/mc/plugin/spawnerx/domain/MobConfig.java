@@ -1,6 +1,7 @@
 package com.github.theprogmatheus.mc.plugin.spawnerx.domain;
 
 import com.github.theprogmatheus.mc.plugin.spawnerx.util.LinkedObject;
+import com.github.theprogmatheus.mc.plugin.spawnerx.util.StringUtils;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,7 +35,7 @@ public class MobConfig extends LinkedObject<String> {
     private final @NotNull EntityType entityType;
 
     private @NotNull String displayName;
-    private @NotNull String stackDisplayFormat = "§6x%stack_mob% &f%type_mob%";
+    private @NotNull String stackDisplayFormat = "§6x%stack_mob% &f%display_name%";
     private int stackMax = Integer.MAX_VALUE;
     private int killUnstackAmountPerSpawner = 1;
     private boolean ai = true;
@@ -48,7 +49,7 @@ public class MobConfig extends LinkedObject<String> {
     public MobConfig(@NotNull String id, @NotNull EntityType entityType) {
         super(id);
         this.entityType = entityType;
-        this.displayName = entityType.name();
+        this.displayName = StringUtils.prettifyEntityName(entityType.name());
     }
 
     private void setDisplayNameIfValid(String displayName) {

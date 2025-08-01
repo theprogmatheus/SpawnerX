@@ -76,7 +76,7 @@ spawners:
 mobs:
   # Formato de exibição do nome da pilha de mobs.
   # Exemplo: x5 Cow
-  format: "&6x%stack_mob% &f%type_mob%"
+  format: "&6x%stack_mob% &f%display_name%"
 
   # Quantidade máxima de mobs que podem ser empilhados.
   stack_max: 300
