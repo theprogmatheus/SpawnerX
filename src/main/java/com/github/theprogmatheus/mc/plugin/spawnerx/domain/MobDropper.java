@@ -60,8 +60,16 @@ public class MobDropper {
         var loc = entity.getEntity().getLocation();
 
         if (drops != null) {
+            MobDropController dropController = null;
+            if (killer instanceof Player player)
+                dropController = PlayerProfile.fromPlayer(player).getMobDropController();
             for (MobDrop drop : drops) {
                 long dropAmount = calculateDropAmount(drop, amount);
+                if (dropAmount <= 0)
+                    continue;
+
+                if (dropController != null && !dropController.processDrop(drop))
+                    continue;
 
                 if (drop instanceof MobDrop.MobDropItem item)
                     dropItem(item, loc, (long) (dropAmount * (1 + getLootingMultiplier(killer, item))));

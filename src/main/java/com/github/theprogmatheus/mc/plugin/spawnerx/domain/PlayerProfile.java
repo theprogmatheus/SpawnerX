@@ -23,10 +23,12 @@ public class PlayerProfile extends LinkedObject<UUID> {
     private transient Long dbId;
     private transient Plugin plugin;
     private final PlayerData playerData;
+    private transient MobDropController mobDropController;
 
     public PlayerProfile(@NotNull PlayerData playerData) {
         super(playerData.getId());
         this.playerData = playerData;
+        this.mobDropController = new MobDropController();
     }
 
     public static PlayerProfile fromPlayer(@NotNull Player player) {
@@ -42,4 +44,5 @@ public class PlayerProfile extends LinkedObject<UUID> {
     public @NotNull OfflinePlayer getOfflinePlayer() {
         return Bukkit.getOfflinePlayer(getOriginal());
     }
+
 }

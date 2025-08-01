@@ -213,9 +213,9 @@ public class MobConfig extends LinkedObject<String> {
 
         if (drop != null) {
             drop.setChance(chance);
-            drop.setDelay(delay);
-            drop.setDelayPerPlayer(delayPerPlayer);
-            drop.setDropLimitByDelay(dropLimitByDelay);
+            drop.setDropLimitInterval(delay);
+            drop.setDelay(delayPerPlayer);
+            drop.setDropLimitByInterval(dropLimitByDelay);
             drop.setPositiveNoise(positiveNoise);
             drop.setNegativeNoise(negativeNoise);
         }
