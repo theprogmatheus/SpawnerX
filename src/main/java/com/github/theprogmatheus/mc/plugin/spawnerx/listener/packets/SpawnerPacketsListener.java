@@ -64,7 +64,7 @@ public class SpawnerPacketsListener extends PacketListenerAbstract {
         Vector3i position = packet.getPosition();
         BlockLocationKey blockLocationKey = new BlockLocationKey(player.getWorld().getName(), position.getX(), position.getY(), position.getZ());
         LinkedObject.getLink(SpawnerBlock.class, blockLocationKey).ifPresent(spawner -> {
-            if (!isAnimatedSpawner(player))
+            if (isHideSpawnerAnim(player))
                 event.setCancelled(true);
         });
     }
@@ -90,14 +90,14 @@ public class SpawnerPacketsListener extends PacketListenerAbstract {
                                 BlockLocationKey.fromBukkitLocation(blockState.getLocation())
                         ).orElse(null);
 
-                        if (spawner != null && !isAnimatedSpawner(player))
+                        if (spawner != null && isHideSpawnerAnim(player))
                             spawner.hideSpawnerAnimation(player);
                     });
         });
     }
 
-    private boolean isAnimatedSpawner(@NotNull Player player) {
+    private boolean isHideSpawnerAnim(@NotNull Player player) {
         var profile = PlayerProfile.fromPlayer(player);
-        return profile.getPlayerData().isAnimatedSpawners();
+        return profile.getPlayerData().isHideSpawnerAnim();
     }
 }

@@ -86,8 +86,8 @@ public class SpawnerXCommand extends AbstractCommand {
         PlayerData data = profile.getPlayerData();
 
         if ("spawners_animation".equalsIgnoreCase(setting)) {
-            data.setAnimatedSpawners(!data.isAnimatedSpawners());
-            player.sendMessage("§eA animação dos spawners foi %s §ecom sucesso.".formatted(data.isAnimatedSpawners() ? "§ahabilitada" : "§cdesabilitada"));
+            data.setHideSpawnerAnim(!data.isHideSpawnerAnim());
+            player.sendMessage("§eEsconder animação dos spawners: %s".formatted(data.isHideSpawnerAnim() ? "§ahabilitado" : "§cdesabilitado"));
         } else {
             player.sendMessage("§cConfiguração não encontrada.");
         }
@@ -111,7 +111,7 @@ public class SpawnerXCommand extends AbstractCommand {
                         .toList());
 
         completions.registerAsyncCompletion("reload_modules", context -> List.of("spawners", "mobs"));
-        completions.registerAsyncCompletion("available_toogles", context -> List.of("spawners_animation"));
+        completions.registerAsyncCompletion("available_toogles", context -> List.of("hide_spawner_animation"));
     }
 
 

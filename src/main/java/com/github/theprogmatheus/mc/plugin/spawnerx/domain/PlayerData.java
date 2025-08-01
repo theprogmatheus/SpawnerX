@@ -8,6 +8,6 @@ import java.util.UUID;
 public class PlayerData {
 
     private final UUID id;
-    private boolean animatedSpawners;
+    private boolean hideSpawnerAnim;
 
 }
