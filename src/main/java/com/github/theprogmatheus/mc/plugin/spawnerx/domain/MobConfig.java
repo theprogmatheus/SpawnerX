@@ -189,13 +189,16 @@ public class MobConfig extends LinkedObject<String> {
         var data = section.getInt("data");
         var durability = section.contains("durability") ? section.getInt("durability") : -1;
         var chance = section.getDouble("chance") / 100.0D;
-        var delay = section.getLong("delay");
+        var delay = section.getLong("drop_controller.global_delay");
+        var delayPerPlayer = section.getLong("drop_controller.player_delay");
+        var dropLimitByDelay = section.getInt("drop_controller.global_amount");
         var min = section.getInt("min");
         var max = section.getInt("max");
         var positiveNoise = section.getDouble("positive_noise") / 100.0D;
         var negativeNoise = section.getDouble("negative_noise") / 100.0D;
         var looting = section.getDouble("looting") / 100.0D;
         var commands = section.getStringList("commands");
+
 
         MobDrop drop = null;
         if ("ITEM".equalsIgnoreCase(dropType)) {
@@ -211,6 +214,8 @@ public class MobConfig extends LinkedObject<String> {
         if (drop != null) {
             drop.setChance(chance);
             drop.setDelay(delay);
+            drop.setDelayPerPlayer(delayPerPlayer);
+            drop.setDropLimitByDelay(dropLimitByDelay);
             drop.setPositiveNoise(positiveNoise);
             drop.setNegativeNoise(negativeNoise);
         }

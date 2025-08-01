@@ -18,6 +18,9 @@ public abstract class MobDrop {
     private double positiveNoise = 0.15;
     private double negativeNoise = 0.15;
     private long delay = 0;
+    private long delayPerPlayer = 0;
+    private int dropLimitByDelay = -1;
+
 
     @Getter
     @Setter
