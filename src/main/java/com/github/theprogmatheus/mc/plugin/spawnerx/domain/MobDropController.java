@@ -2,9 +2,10 @@ package com.github.theprogmatheus.mc.plugin.spawnerx.domain;
 
 import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,9 +13,10 @@ import java.util.Map;
 public class MobDropController {
 
     @Getter
-    private static final MobDropController global = new MobDropController();
+    @Setter
+    private static MobDropController global = new MobDropController(new HashMap<>());
 
-    private final Map<String, MobDropSnapshotData> dropSnapshots = new HashMap<>();
+    private final Map<String, MobDropSnapshotData> dropSnapshots;
 
     public boolean processDrop(@NotNull MobDrop drop) {
         var result = canDropNow(drop);
@@ -62,6 +64,28 @@ public class MobDropController {
 
     public MobDropSnapshotData getDropSnapshot(@NotNull MobDrop drop) {
         return this.dropSnapshots.computeIfAbsent(drop.getId(), key -> new MobDropSnapshotData());
+    }
+
+    public void serializeInFile(@NotNull File file) {
+        try (var objectOutputStream = new ObjectOutputStream(new FileOutputStream(file))) {
+            objectOutputStream.writeObject(global.dropSnapshots);
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static MobDropController deserializeFromFile(@NotNull File file) {
+        if (!file.exists())
+            return new MobDropController(new HashMap<>());
+
+        try (var objectInputStream = new ObjectInputStream(new FileInputStream(file))) {
+            var dropSnapshots = (Map<String, MobDropSnapshotData>) objectInputStream.readObject();
+            return new MobDropController(dropSnapshots);
+        } catch (IOException | ClassNotFoundException exception) {
+            exception.printStackTrace();
+            return new MobDropController(new HashMap<>());
+        }
     }
 
     @Getter

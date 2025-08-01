@@ -4,10 +4,7 @@ import com.github.theprogmatheus.mc.plugin.spawnerx.SpawnerX;
 import com.github.theprogmatheus.mc.plugin.spawnerx.database.entity.SpawnerBlockEntity;
 import com.github.theprogmatheus.mc.plugin.spawnerx.database.mappers.SpawnerBlockMapper;
 import com.github.theprogmatheus.mc.plugin.spawnerx.database.repository.SpawnerBlockRepository;
-import com.github.theprogmatheus.mc.plugin.spawnerx.domain.MobConfig;
-import com.github.theprogmatheus.mc.plugin.spawnerx.domain.MobEntity;
-import com.github.theprogmatheus.mc.plugin.spawnerx.domain.SpawnerBlock;
-import com.github.theprogmatheus.mc.plugin.spawnerx.domain.SpawnerBlockConfig;
+import com.github.theprogmatheus.mc.plugin.spawnerx.domain.*;
 import com.github.theprogmatheus.mc.plugin.spawnerx.lib.Injector;
 import com.github.theprogmatheus.mc.plugin.spawnerx.lib.PluginService;
 import com.github.theprogmatheus.mc.plugin.spawnerx.util.ExecutorTimeLogger;
@@ -19,6 +16,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.io.File;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
@@ -36,6 +34,7 @@ public class SpawnerXService extends PluginService {
     private SpawnerBlockRepository spawnerBlockRepository;
     private SpawnerBlockMapper spawnerBlockMapper;
     private BukkitTask autoSaveAndPurgeTask;
+    private File mobDropControllerGlobalFile;
 
     @Override
     public void startup() {
@@ -59,6 +58,21 @@ public class SpawnerXService extends PluginService {
         saveSpawnerBlocks();
         purgeSpawnerBlocks();
         unloadPacketEvents();
+    }
+
+    public void loadGlobalMobDropController() {
+        if (this.mobDropControllerGlobalFile == null)
+            this.mobDropControllerGlobalFile = new File(this.plugin.getDataFolder(), "mob-drop-controller.global.dat");
+
+        if (this.mobDropControllerGlobalFile.exists())
+            MobDropController.setGlobal(MobDropController.deserializeFromFile(this.mobDropControllerGlobalFile));
+    }
+
+    public void saveGlobalMobDropController() {
+        var global = MobDropController.getGlobal();
+        if (global.getDropSnapshots().isEmpty())
+            return;
+        global.serializeInFile(this.mobDropControllerGlobalFile);
     }
 
     public void loadPacketEvents() {
@@ -111,6 +125,9 @@ public class SpawnerXService extends PluginService {
                 log.log(Level.SEVERE, "It was not possible to load the database spawners.", e);
             }
         });
+
+        // pegar uma carona aqui por enquanto kk
+        loadGlobalMobDropController();
     }
 
     public synchronized void saveSpawnerBlocks() {
@@ -139,6 +156,8 @@ public class SpawnerXService extends PluginService {
                 log.log(Level.SEVERE, "An error occurred when trying to save the spawners in the database.", e);
             }
         });
+        // pegar uma carona aqui por enquanto kk
+        saveGlobalMobDropController();
     }
 
     public void purgeSpawnerBlocks() {

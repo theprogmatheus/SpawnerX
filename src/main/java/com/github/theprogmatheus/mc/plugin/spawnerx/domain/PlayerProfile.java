@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 @Getter
@@ -28,7 +29,7 @@ public class PlayerProfile extends LinkedObject<UUID> {
     public PlayerProfile(@NotNull PlayerData playerData) {
         super(playerData.getId());
         this.playerData = playerData;
-        this.mobDropController = new MobDropController();
+        this.mobDropController = new MobDropController(playerData.getDropSnapshots() != null ? playerData.getDropSnapshots() : new HashMap<>());
     }
 
     public static PlayerProfile fromPlayer(@NotNull Player player) {
