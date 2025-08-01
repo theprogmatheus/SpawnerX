@@ -1,10 +1,12 @@
 package com.github.theprogmatheus.mc.plugin.spawnerx.domain;
 
+import com.github.theprogmatheus.mc.plugin.spawnerx.config.env.Config;
 import com.github.theprogmatheus.mc.plugin.spawnerx.util.LinkedObject;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.CreatureSpawner;
@@ -14,10 +16,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 @Setter
@@ -49,15 +48,27 @@ public class SpawnerBlockConfig extends LinkedObject<String> {
 
 
     public ItemStack createItemStack(int amount) {
+
+        var itemDisplayName = Config.SPAWNERS_ITEM_NAME.getValue();
+        var itemLore = Config.SPAWNERS_ITEM_LORE.getValue();
+
         var itemStack = new ItemStack(Material.SPAWNER, amount);
         var itemMeta = itemStack.getItemMeta();
         var persistentDataContainer = itemMeta.getPersistentDataContainer();
 
         persistentDataContainer.set(this.namespacedKey, PersistentDataType.STRING, this.id);
-        itemMeta.setDisplayName("§6Mob Spawner");
-        itemMeta.setLore(List.of(
-                "§7Type: §f" + this.mobConfig.getDisplayName()
-        ));
+        if (itemDisplayName != null)
+            itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', itemDisplayName)
+                    .replace("%display_name%", this.mobConfig.getDisplayName()));
+
+        if (itemLore != null) {
+            List<String> lore = new ArrayList<>();
+            itemLore.forEach(line -> {
+                lore.add(ChatColor.translateAlternateColorCodes('&', line)
+                        .replace("%display_name%", this.mobConfig.getDisplayName()));
+            });
+            itemMeta.setLore(lore);
+        }
 
         itemStack.setItemMeta(itemMeta);
         return itemStack;

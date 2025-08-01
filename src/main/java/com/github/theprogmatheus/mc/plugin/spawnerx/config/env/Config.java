@@ -25,7 +25,7 @@ public class Config {
     public static final ConfigurationHolder<String> SPAWNERS_ITEM_NAME =
             new ConfigurationHolder<>("spawners.item.name", String.class);
     public static final ConfigurationHolder<List<String>> SPAWNERS_ITEM_LORE =
-            new ConfigurationHolder<>("spawners.item.name", (Class<List<String>>) (Class<?>) List.class);
+            new ConfigurationHolder<>("spawners.item.lore", (Class<List<String>>) (Class<?>) List.class);
     public static final ConfigurationHolder<Boolean> SPAWNERS_HOLOGRAM =
             new ConfigurationHolder<>("spawners.hologram", Boolean.class);
     public static final ConfigurationHolder<List<String>> SPAWNERS_HOLOGRAM_FORMAT =
