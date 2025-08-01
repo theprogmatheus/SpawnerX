@@ -107,6 +107,14 @@ public class SpawnerBlockConfig extends LinkedObject<String> {
     }
 
     private static void applyDefaultConfigs(@NotNull SpawnerBlockConfig config) {
+        config.setDelay(Config.SPAWNERS_SETTINGS_MIN_SPAWN_DELAY.getValue());
+        config.setMinSpawnDelay(Config.SPAWNERS_SETTINGS_MIN_SPAWN_DELAY.getValue());
+        config.setMaxSpawnDelay(Config.SPAWNERS_SETTINGS_MAX_SPAWN_DELAY.getValue());
+        config.setSpawnCount(Config.SPAWNERS_SETTINGS_SPAWN_COUNT.getValue());
+        config.setSpawnRange(Config.SPAWNERS_SETTINGS_SPAWN_RANGE.getValue());
+        config.setRequiredPlayerRange(Config.SPAWNERS_SETTINGS_REQUIRED_PLAYER_RANGE.getValue());
+        config.setMaxNearbyEntities(Config.SPAWNERS_SETTINGS_MAX_NEARBY_ENTITIES.getValue());
+
         config.setItemName(Config.SPAWNERS_ITEM_NAME.getValue());
         config.setItemLore(Config.SPAWNERS_ITEM_LORE.getValue());
         config.setHologram(Config.SPAWNERS_HOLOGRAM.getValue());

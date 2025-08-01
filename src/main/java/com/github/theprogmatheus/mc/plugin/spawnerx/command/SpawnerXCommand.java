@@ -111,7 +111,7 @@ public class SpawnerXCommand extends AbstractCommand {
                         .toList());
 
         completions.registerAsyncCompletion("reload_modules", context -> List.of("spawners", "mobs"));
-        completions.registerAsyncCompletion("available_toogles", context -> List.of("hide_spawner_animation"));
+        completions.registerAsyncCompletion("available_toogles", context -> List.of("spawners_animation"));
     }
 
 
