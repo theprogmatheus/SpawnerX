@@ -33,7 +33,6 @@ import java.util.logging.Logger;
 public class MobEntity extends LinkedObject<UUID> {
 
     private static final Gson gson = new Gson();
-    private static final String stackedAmountDisplayFormat = "§fx%s";
     private static final NamespacedKey dataNamespacedKey = new NamespacedKey("spawnerx", "mob_entity_data");
     private static final NamespacedKey mobEntityRefNamespacedKey = new NamespacedKey("spawnerx", "mob_entity_ref");
 

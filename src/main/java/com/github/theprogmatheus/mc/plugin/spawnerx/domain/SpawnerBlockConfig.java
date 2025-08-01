@@ -29,7 +29,14 @@ public class SpawnerBlockConfig extends LinkedObject<String> {
 
     private final String id;
     private final MobConfig mobConfig;
-    private boolean animatedSpawner;
+    private boolean hologram;
+    private List<String> hologramLines;
+    private String itemName;
+    private List<String> itemLore;
+    private boolean stackEnabled;
+    private int stackMax;
+    private int stackDistance;
+    private boolean onlySilkTouchBreak;
     private int delay = 20;
     private int minSpawnDelay = 40;
     private int maxSpawnDelay = 100;
@@ -48,17 +55,13 @@ public class SpawnerBlockConfig extends LinkedObject<String> {
 
 
     public ItemStack createItemStack(int amount) {
-
-        var itemDisplayName = Config.SPAWNERS_ITEM_NAME.getValue();
-        var itemLore = Config.SPAWNERS_ITEM_LORE.getValue();
-
         var itemStack = new ItemStack(Material.SPAWNER, amount);
         var itemMeta = itemStack.getItemMeta();
         var persistentDataContainer = itemMeta.getPersistentDataContainer();
 
         persistentDataContainer.set(this.namespacedKey, PersistentDataType.STRING, this.id);
-        if (itemDisplayName != null)
-            itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', itemDisplayName)
+        if (itemName != null)
+            itemMeta.setDisplayName(ChatColor.translateAlternateColorCodes('&', itemName)
                     .replace("%display_name%", this.mobConfig.getDisplayName()));
 
         if (itemLore != null) {
@@ -74,7 +77,14 @@ public class SpawnerBlockConfig extends LinkedObject<String> {
         return itemStack;
     }
 
-    public boolean updateCreatureSpawner(@NotNull CreatureSpawner creatureSpawner) {
+    public void applyToSpawnerBlock(@NotNull SpawnerBlock spawnerBlock) {
+        var block = spawnerBlock.getBlock();
+        var blockState = block.getState();
+        if (blockState instanceof CreatureSpawner creatureSpawner)
+            updateCreatureSpawner(creatureSpawner);
+    }
+
+    private boolean updateCreatureSpawner(@NotNull CreatureSpawner creatureSpawner) {
         creatureSpawner.setSpawnedType(this.mobConfig.getEntityType());
 
         creatureSpawner.setDelay(this.delay);
@@ -88,10 +98,23 @@ public class SpawnerBlockConfig extends LinkedObject<String> {
         return creatureSpawner.update();
     }
 
+
     public static void loadDefaults(@NotNull Plugin plugin) {
         Arrays.stream(EntityType.values())
                 .filter(EntityType::isAlive)
-                .forEach(entityType -> new SpawnerBlockConfig(plugin, entityType.name(), MobConfig.getConfig(entityType)).link());
+                .forEach(entityType -> applyDefaultConfigs(LinkedObject.getLink(SpawnerBlockConfig.class, entityType.name().toLowerCase())
+                        .orElseGet(() -> (SpawnerBlockConfig) new SpawnerBlockConfig(plugin, entityType.name(), MobConfig.getConfig(entityType)).link())));
+    }
+
+    private static void applyDefaultConfigs(@NotNull SpawnerBlockConfig config) {
+        config.setItemName(Config.SPAWNERS_ITEM_NAME.getValue());
+        config.setItemLore(Config.SPAWNERS_ITEM_LORE.getValue());
+        config.setHologram(Config.SPAWNERS_HOLOGRAM.getValue());
+        config.setHologramLines(Config.SPAWNERS_HOLOGRAM_FORMAT.getValue());
+        config.setStackEnabled(Config.SPAWNERS_STACK_ENABLE.getValue());
+        config.setStackMax(Config.SPAWNERS_STACK_MAX.getValue());
+        config.setStackDistance(Config.SPAWNERS_STACK_DISTANCE.getValue());
+        config.setOnlySilkTouchBreak(Config.SPAWNERS_ONLY_SILKTOUCH.getValue());
     }
 
     public static String getSpawnerBlockConfigId(@NotNull Plugin plugin, @NotNull ItemStack itemStack) {

@@ -49,7 +49,11 @@ public class PlayerProfileService extends PluginService {
         try {
             this.playerProfileRepository.queryForEq("uuidString", player.getUniqueId().toString())
                     .stream().findAny()
-                    .ifPresent(playerProfileEntity -> this.playerProfilerMapper.mapTo(playerProfileEntity).link());
+                    .ifPresent(playerProfileEntity -> {
+                        var playerProfile = this.playerProfilerMapper.mapTo(playerProfileEntity);
+                        playerProfile.setPlugin(this.plugin);
+                        playerProfile.link();
+                    });
         } catch (SQLException e) {
             log.log(Level.SEVERE, "An error occurred when trying to load the PlayerProfile from the database: %s".formatted(player.getUniqueId()), e);
         }

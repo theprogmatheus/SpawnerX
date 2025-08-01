@@ -77,7 +77,12 @@ public class SpawnerXService extends PluginService {
     public void reloadSpawnerBlocks() {
         ExecutorTimeLogger.executeAndLogTime(this.log, "Reload SpawnerBlockConfig's", () -> {
             this.configurationService.reload();
-            // TODO
+            SpawnerBlockConfig.loadDefaults(this.plugin);
+            LinkedObject.getLinkerMap(SpawnerBlock.class).ifPresent(map -> map.values().forEach(spawner -> {
+                if (spawner.isBroken())
+                    return;
+                spawner.getConfig().applyToSpawnerBlock(spawner);
+            }));
         });
     }
 

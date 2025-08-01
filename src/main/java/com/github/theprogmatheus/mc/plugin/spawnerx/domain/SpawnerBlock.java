@@ -1,6 +1,5 @@
 package com.github.theprogmatheus.mc.plugin.spawnerx.domain;
 
-import com.github.theprogmatheus.mc.plugin.spawnerx.config.env.Config;
 import com.github.theprogmatheus.mc.plugin.spawnerx.kdtree.KDNode;
 import com.github.theprogmatheus.mc.plugin.spawnerx.kdtree.KDTree;
 import com.github.theprogmatheus.mc.plugin.spawnerx.util.InventoryUtils;
@@ -54,10 +53,8 @@ public class SpawnerBlock extends LinkedObject<BlockLocationKey> {
     public LinkedObject<BlockLocationKey> link() {
         if (!super.hasLinked()) {
             super.link();
-            if (getBlock().getState() instanceof CreatureSpawner creatureSpawner)
-                this.config.updateCreatureSpawner(creatureSpawner);
-
             addToKdTree();
+            getConfig().applyToSpawnerBlock(this);
         }
         return this;
     }
@@ -142,7 +139,7 @@ public class SpawnerBlock extends LinkedObject<BlockLocationKey> {
 
         var inventory = player.getInventory();
         var itemInMainHand = inventory.getItemInMainHand();
-        if (Config.SPAWNERS_ONLY_SILKTOUCH.getValue() && (!itemInMainHand.containsEnchantment(Enchantment.SILK_TOUCH)))
+        if (getConfig().isOnlySilkTouchBreak() && (!itemInMainHand.containsEnchantment(Enchantment.SILK_TOUCH)))
             return;
 
         var loc = event.getBlock().getLocation().add(0.5, 0.5, 0.5);

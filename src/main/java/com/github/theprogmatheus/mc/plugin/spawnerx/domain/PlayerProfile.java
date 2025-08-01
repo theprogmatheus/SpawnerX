@@ -6,7 +6,10 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -18,6 +21,7 @@ import java.util.UUID;
 public class PlayerProfile extends LinkedObject<UUID> {
 
     private transient Long dbId;
+    private transient Plugin plugin;
     private final PlayerData playerData;
 
     public PlayerProfile(@NotNull PlayerData playerData) {
@@ -31,4 +35,11 @@ public class PlayerProfile extends LinkedObject<UUID> {
 
     }
 
+    public Player getPlayer() {
+        return Bukkit.getPlayer(getOriginal());
+    }
+
+    public @NotNull OfflinePlayer getOfflinePlayer() {
+        return Bukkit.getOfflinePlayer(getOriginal());
+    }
 }
