@@ -171,8 +171,9 @@ public class MobConfig extends LinkedObject<String> {
             var dropSection = allDropsSection.getConfigurationSection(dropKey);
             if (dropSection == null) continue;
 
+            var dropId = ("%s:%s").formatted(config.getOriginal(), dropKey);
             try {
-                MobDrop drop = parseDropSection(dropSection);
+                MobDrop drop = parseDropSection(dropId, dropSection);
                 if (drop != null) drops.add(drop);
             } catch (Exception exception) {
                 exception.printStackTrace();
@@ -181,7 +182,7 @@ public class MobConfig extends LinkedObject<String> {
         config.setDrops(drops);
     }
 
-    private static MobDrop parseDropSection(ConfigurationSection section) {
+    private static MobDrop parseDropSection(@NotNull String dropId, @NotNull ConfigurationSection section) {
 
         var dropType = section.getString("drop_type");
         var materialName = section.getString("material");
@@ -200,11 +201,11 @@ public class MobConfig extends LinkedObject<String> {
         if ("ITEM".equalsIgnoreCase(dropType)) {
             var material = Material.valueOf(materialName.toUpperCase());
             ItemStack item = resolveItem(material, durability);
-            var itemDrop = new MobDrop.MobDropItem(item, min, max);
+            var itemDrop = new MobDrop.MobDropItem(dropId, item, min, max);
             itemDrop.setLooting(looting);
             drop = itemDrop;
         } else if ("COMMAND".equalsIgnoreCase(dropType))
-            drop = new MobDrop.MobDropCommand(commands);
+            drop = new MobDrop.MobDropCommand(dropId, commands);
 
 
         if (drop != null) {
