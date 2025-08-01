@@ -10,6 +10,8 @@ import com.github.theprogmatheus.mc.plugin.spawnerx.lib.PluginService;
 import com.github.theprogmatheus.mc.plugin.spawnerx.util.ExecutorTimeLogger;
 import com.github.theprogmatheus.mc.plugin.spawnerx.util.LinkedObject;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -32,8 +34,6 @@ public class PlayerProfileService extends PluginService {
     public void startup() {
         this.playerProfileRepository = this.injector.getInstance(PlayerProfileRepository.class);
         this.playerProfilerMapper = this.injector.getInstance(PlayerProfileMapper.class);
-
-        loadPlayerProfiles();
     }
 
 
@@ -42,18 +42,17 @@ public class PlayerProfileService extends PluginService {
         savePlayerProfiles();
     }
 
+    public void loadPlayerProfile(@NotNull Player player) {
+        if (LinkedObject.getLink(PlayerProfile.class, player.getUniqueId()).isPresent())
+            return;
 
-    public void loadPlayerProfiles() {
-        ExecutorTimeLogger.executeAndLogTime(this.log, "Load PlayerProfiles", () -> {
-            try {
-                this.playerProfileRepository.queryForAll()
-                        .stream()
-                        .map(this.playerProfilerMapper::mapTo)
-                        .forEach(PlayerProfile::link);
-            } catch (SQLException e) {
-                log.log(Level.SEVERE, "It was not possible to load the player profiles.", e);
-            }
-        });
+        try {
+            this.playerProfileRepository.queryForEq("uuidString", player.getUniqueId().toString())
+                    .stream().findAny()
+                    .ifPresent(playerProfileEntity -> this.playerProfilerMapper.mapTo(playerProfileEntity).link());
+        } catch (SQLException e) {
+            log.log(Level.SEVERE, "An error occurred when trying to load the PlayerProfile from the database: %s".formatted(player.getUniqueId()), e);
+        }
     }
 
     //   Por enquanto, não há muito dados importantes a serem salvos, poranto não há necessidade de salvar de tempos em tempos ainda.

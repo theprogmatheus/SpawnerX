@@ -7,6 +7,7 @@ import com.github.theprogmatheus.mc.plugin.spawnerx.listener.lang.PlayerJoinLang
 import com.github.theprogmatheus.mc.plugin.spawnerx.listener.mobs.MobDeathListener;
 import com.github.theprogmatheus.mc.plugin.spawnerx.listener.mobs.MobEntityBehaviorController;
 import com.github.theprogmatheus.mc.plugin.spawnerx.listener.mobs.MobSpawnListener;
+import com.github.theprogmatheus.mc.plugin.spawnerx.listener.player.PlayerJoinListener;
 import com.github.theprogmatheus.mc.plugin.spawnerx.listener.spawners.SpawnerBlockBreakListener;
 import com.github.theprogmatheus.mc.plugin.spawnerx.listener.spawners.SpawnerBlockInteractListener;
 import com.github.theprogmatheus.mc.plugin.spawnerx.listener.spawners.SpawnerBlockPlaceListener;
@@ -39,6 +40,7 @@ public class ListenerService extends PluginService {
         registerListener(MobEntityBehaviorController.class);
         registerListener(MobSpawnListener.class);
         registerListener(MobDeathListener.class);
+        registerListener(PlayerJoinListener.class);
     }
 
     private void unregisterAllListeners() {

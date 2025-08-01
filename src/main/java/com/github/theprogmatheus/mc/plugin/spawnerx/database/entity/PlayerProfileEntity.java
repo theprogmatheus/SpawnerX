@@ -17,7 +17,7 @@ public class PlayerProfileEntity {
     @DatabaseField(generatedId = true)
     private Long id;
 
-    @DatabaseField(canBeNull = false, unique = true)
+    @DatabaseField(canBeNull = false, unique = true, index = true)
     private String uuidString;
 
     @DatabaseField(canBeNull = false, persisterClass = SimpleObjectJSONPersister.class)
