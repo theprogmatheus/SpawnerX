@@ -34,10 +34,12 @@ public class SpawnerBlock extends LinkedObject<BlockLocationKey> {
 
     private transient Long dbId;
     private final transient SpawnerBlockConfig config;
+    private int stackedAmount;
 
     public SpawnerBlock(@NotNull Block block, @NotNull SpawnerBlockConfig config) {
         super(BlockLocationKey.fromBukkitLocation(block.getLocation()));
         this.config = config;
+        this.stackedAmount = 1;
     }
 
     public SpawnerBlock(@NotNull BlockLocationKey blockLocationKey, @NotNull SpawnerBlockConfig config) {

@@ -30,11 +30,12 @@ public class SpawnerBlockMapper implements ObjectMapper<SpawnerBlockEntity, Spaw
                 .orElseGet(() -> new SpawnerBlock(location, new SpawnerBlockConfig(this.plugin, configId, new MobConfig(EntityType.UNKNOWN.name(), EntityType.UNKNOWN))));
 
         spawnerBlock.setDbId(spawnerBlockEntity.getId());
+        spawnerBlock.setStackedAmount(spawnerBlockEntity.getStackedAmount());
         return spawnerBlock;
     }
 
     @Override
     public SpawnerBlockEntity mapFrom(@NotNull SpawnerBlock spawnerBlock) {
-        return new SpawnerBlockEntity(spawnerBlock.getDbId(), spawnerBlock.getConfig().getId(), spawnerBlock.getOriginal());
+        return new SpawnerBlockEntity(spawnerBlock.getDbId(), spawnerBlock.getConfig().getId(), spawnerBlock.getOriginal(), spawnerBlock.getStackedAmount());
     }
 }

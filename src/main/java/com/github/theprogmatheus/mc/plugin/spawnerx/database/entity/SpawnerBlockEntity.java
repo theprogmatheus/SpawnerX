@@ -22,4 +22,7 @@ public class SpawnerBlockEntity {
 
     @DatabaseField(canBeNull = false, persisterClass = LocationKeyPersister.class, unique = true, index = true)
     private BlockLocationKey location;
+
+    @DatabaseField(canBeNull = false)
+    private Integer stackedAmount;
 }
