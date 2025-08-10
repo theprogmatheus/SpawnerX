@@ -51,7 +51,7 @@ public class SpawnerBlockRepository {
     public List<SpawnerBlock> findByChunk(String world, int chunkX, int chunkZ) throws SQLException {
         List<SpawnerBlock> spawners = new ArrayList<>();
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(getSQL("sql/spawners/spawner_block_by_chunk.sql"))) {
+             PreparedStatement stmt = conn.prepareStatement(getSQL("sql/mysql/spawners/spawner_block_by_chunk.sql"))) {
 
             stmt.setString(1, world);
             stmt.setInt(2, chunkX);

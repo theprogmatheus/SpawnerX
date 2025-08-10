@@ -10,10 +10,10 @@ CREATE TABLE IF NOT EXISTS %prefix%_spawner_blocks (
     PRIMARY KEY (world, x, y, z),
     INDEX idx_chunk (world, chunk_x, chunk_z),
     INDEX idx_config (config, world)
-);
+) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS %prefix%_player_profiles (
     uuid CHAR(36) NOT NULL,
     data BLOB,
     PRIMARY KEY (uuid)
-);
+) ENGINE=InnoDB;
