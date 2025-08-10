@@ -12,9 +12,3 @@ CREATE TABLE %prefix%_spawner_blocks (
 
 CREATE INDEX idx_chunk ON %prefix%_spawner_blocks (world, chunk_x, chunk_z);
 CREATE INDEX idx_config ON %prefix%_spawner_blocks (config, world);
-
-CREATE TABLE %prefix%_player_profiles (
-    uuid CHAR(36) NOT NULL,
-    data BLOB,
-    PRIMARY KEY (uuid)
-);

@@ -32,14 +32,12 @@ public class SpawnerXService extends PluginService {
     private final transient ConfigurationService configurationService;
 
     private SpawnerBlockRepository spawnerBlockRepository;
-    private SpawnerBlockMapper spawnerBlockMapper;
     private BukkitTask autoSaveAndPurgeTask;
     private File mobDropControllerGlobalFile;
 
     @Override
     public void startup() {
         this.spawnerBlockRepository = this.injector.getInstance(SpawnerBlockRepository.class);
-        this.spawnerBlockMapper = this.injector.getInstance(SpawnerBlockMapper.class);
         this.autoSaveAndPurgeTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this.plugin, this::saveSpawnerBlocks, 20 * 300, 20 * 300);
 
         MobConfig.loadDefaults(this.plugin);

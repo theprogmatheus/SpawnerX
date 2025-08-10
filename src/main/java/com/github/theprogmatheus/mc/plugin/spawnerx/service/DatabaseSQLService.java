@@ -31,30 +31,36 @@ public class DatabaseSQLService extends PluginService {
         if (inTestMode)
             return loadTestDatabaseConfig();
 
-        return loadLocalDatabaseConfig();
+        return loadSqliteDatabaseConfig();
     }
 
 
-    private HikariConfig loadLocalDatabaseConfig() {
-        var storageFile = new File(this.plugin.getDataFolder(), "storage-h2");
+    private HikariConfig loadSqliteDatabaseConfig() {
+        var storageFile = new File(this.plugin.getDataFolder(), "storage.db");
         var dataFolder = storageFile.getParentFile();
         if (!dataFolder.exists())
             dataFolder.mkdirs();
 
         var config = new HikariConfig();
-        config.setDriverClassName("org.h2.Driver");
-        config.setJdbcUrl("jdbc:h2:file:%s".formatted(storageFile.toPath().toAbsolutePath()));
-        config.addDataSourceProperty("cachePrepStmts", "true");
-        config.addDataSourceProperty("prepStmtCacheSize", "250");
-        config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+        config.setDriverClassName("org.sqlite.JDBC");
+        config.setJdbcUrl("jdbc:sqlite:" + storageFile.getAbsolutePath());
+
+        config.addDataSourceProperty("foreign_keys", "true");
+        config.addDataSourceProperty("journal_mode", "WAL");
+        config.addDataSourceProperty("cache_size", "5000");
+        config.addDataSourceProperty("synchronous", "NORMAL");
+        config.addDataSourceProperty("busy_timeout", "3000");
+
+        config.setMaximumPoolSize(1);
+        config.setMinimumIdle(1);
         return config;
     }
 
     private HikariConfig loadTestDatabaseConfig() {
         var config = new HikariConfig();
         String dbName = UUID.randomUUID().toString();
-        config.setDriverClassName("org.h2.Driver");
-        config.setJdbcUrl("jdbc:h2:mem:%s;DB_CLOSE_DELAY=-1".formatted(dbName));
+        config.setDriverClassName("org.sqlite.JDBC");
+        config.setJdbcUrl("jdbc:sqlite::memory:");
         return config;
     }
 

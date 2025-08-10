@@ -1,28 +1,17 @@
 package com.github.theprogmatheus.mc.plugin.spawnerx.database.entity;
 
-import com.github.theprogmatheus.mc.plugin.spawnerx.database.converter.LocationKeyPersister;
-import com.github.theprogmatheus.mc.plugin.spawnerx.domain.BlockLocationKey;
-import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.table.DatabaseTable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@DatabaseTable(tableName = "spawnerx_spawner_block")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class SpawnerBlockEntity {
 
-    @DatabaseField(generatedId = true)
-    private Long id;
-
-    @DatabaseField(canBeNull = false)
+    private String world;
+    private int x, y, z, chunkX, chunkZ;
     private String config;
+    private int amount;
 
-    @DatabaseField(canBeNull = false, persisterClass = LocationKeyPersister.class, unique = true, index = true)
-    private BlockLocationKey location;
-
-    @DatabaseField(canBeNull = false)
-    private Integer stackedAmount;
 }

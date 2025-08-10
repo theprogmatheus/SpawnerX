@@ -1,8 +1,6 @@
 package com.github.theprogmatheus.mc.plugin.spawnerx.database;
 
 import com.github.theprogmatheus.mc.plugin.spawnerx.lib.Injector;
-import com.j256.ormlite.jdbc.DataSourceConnectionSource;
-import com.j256.ormlite.support.ConnectionSource;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.Getter;
@@ -18,16 +16,12 @@ public class DatabaseSQLManager {
     private final HikariConfig databaseConfig;
 
     private HikariDataSource dataSource;
-    private ConnectionSource connectionSource;
 
     public void openConnection() throws SQLException {
         this.dataSource = new HikariDataSource(this.databaseConfig);
-        this.connectionSource = new DataSourceConnectionSource(this.dataSource, this.databaseConfig.getJdbcUrl());
-        this.injector.registerSingleton(ConnectionSource.class, this.connectionSource);
     }
 
     public void closeConnection() throws Exception {
-        this.connectionSource.close();
         this.dataSource.close();
     }
 

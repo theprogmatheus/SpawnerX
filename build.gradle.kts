@@ -17,10 +17,8 @@ val pluginDescription = "A spawner plugin for your paper server"
 val pluginDependencies = listOf(
     "javax.inject:javax.inject:1",
     "net.gmcbm.dependencies:acf-paper:0.5.2",
-    "com.j256.ormlite:ormlite-jdbc:6.1",
     "com.zaxxer:HikariCP:6.1.0",
-    "com.h2database:h2:2.3.232"
-)// Repository: https://repo.papermc.io/
+)
 val supportsLibraries = true
 
 repositories {
