@@ -58,16 +58,14 @@ public class SpawnerBlockPersist {
         this.checkFlush();
     }
 
-
     public void delete(@NotNull SpawnerBlock spawner) {
         this.mapRef.get().put(spawner.getOriginal(), Optional.empty());
         this.checkFlush();
     }
 
-
     private void checkFlush() {
         if (this.mapRef.get().size() >= MAP_LIMIT)
-            this.flush();
+            this.scheduler.execute(this::flush);
     }
 
     private void flush() {

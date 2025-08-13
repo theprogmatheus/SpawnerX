@@ -40,6 +40,7 @@ public class SpawnerBlockLoader {
         this.chunksLoading.add(chunkCoord);
         CompletableFuture.supplyAsync(() -> this.repository.getByChunk(chunk.getWorld().getName(), chunk.getX(), chunk.getZ()))
                 .thenAccept(spawnerEntities -> {
+
                     spawnerEntities.stream()
                             .map(entity -> {
                                 BlockLocationKey location = new BlockLocationKey(
@@ -57,7 +58,11 @@ public class SpawnerBlockLoader {
                                         .map(config -> new SpawnerBlock(location, config));
                             })
                             .flatMap(Optional::stream)
-                            .forEach(spawner -> Bukkit.getScheduler().runTask(plugin, spawner::link));
+                            .forEach(spawner -> Bukkit.getScheduler().runTask(plugin, () -> {
+                                if (spawner.isOk()) {
+                                    spawner.link();
+                                }
+                            }));
 
                 }).whenComplete((result, throwable) -> this.chunksLoading.remove(chunkCoord));
     }
