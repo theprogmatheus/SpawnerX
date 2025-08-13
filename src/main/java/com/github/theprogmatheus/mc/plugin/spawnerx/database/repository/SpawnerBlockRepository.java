@@ -1,10 +1,9 @@
 package com.github.theprogmatheus.mc.plugin.spawnerx.database.repository;
 
-import com.github.theprogmatheus.mc.plugin.spawnerx.domain.SpawnerBlock;
+import com.github.theprogmatheus.mc.plugin.spawnerx.database.SqlQueryLoader;
+import com.github.theprogmatheus.mc.plugin.spawnerx.database.entity.SpawnerBlockEntity;
 import com.zaxxer.hikari.HikariDataSource;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.block.Block;
+import lombok.Data;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,92 +11,102 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
+@Data
 public class SpawnerBlockRepository {
 
+    private final SqlQueryLoader sqlQueryLoader;
     private final HikariDataSource dataSource;
 
-    public SpawnerBlockRepository(HikariDataSource dataSource) {
-        this.dataSource = dataSource;
-    }
+    public SpawnerBlockRepository(SqlQueryLoader sqlQueryLoader, HikariDataSource hikariDataSource) throws SQLException {
+        this.sqlQueryLoader = sqlQueryLoader;
+        this.dataSource = hikariDataSource;
 
-    private String getSQL(String path) {
-        throw new UnsupportedOperationException("Necessário implementar isso aqui ainda.");
-    }
-
-    public void insert(SpawnerBlock spawner) throws SQLException {
-
-        Block block = spawner.getBlock();
-        Location loc = block.getLocation();
-        Chunk chunk = block.getChunk();
-
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(getSQL("sql/insert/spawner_block.sql"))) {
-
-            stmt.setString(1, loc.getWorld().getName());
-            stmt.setInt(2, loc.getBlockX());
-            stmt.setInt(3, loc.getBlockY());
-            stmt.setInt(4, loc.getBlockZ());
-            stmt.setInt(5, chunk.getX());
-            stmt.setInt(6, chunk.getZ());
-            stmt.setString(7, spawner.getConfig().getId());
-            stmt.setInt(8, spawner.getStackedAmount());
-
-            stmt.executeUpdate();
-        }
-    }
-
-    public List<SpawnerBlock> findByChunk(String world, int chunkX, int chunkZ) throws SQLException {
-        List<SpawnerBlock> spawners = new ArrayList<>();
-        try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(getSQL("sql/mysql/spawners/spawner_block_by_chunk.sql"))) {
-
-            stmt.setString(1, world);
-            stmt.setInt(2, chunkX);
-            stmt.setInt(3, chunkZ);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    spawners.add(mapRow(rs));
-                }
+        try (var connection = this.dataSource.getConnection();
+             var statement = connection.createStatement()) {
+            for (String createTable : this.sqlQueryLoader.getQueries("create_tables")) {
+                statement.executeUpdate(createTable);
             }
         }
-        return spawners;
     }
 
-    public Optional<SpawnerBlock> findByLocation(String world, int x, int y, int z) throws SQLException {
+    public void insertSpawner(SpawnerBlockEntity placeholder) throws SQLException {
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(getSQL("sql/select/spawner_block_by_location.sql"))) {
+             PreparedStatement ps = conn.prepareStatement(sqlQueryLoader.getQuery("insert_spawner"))) {
 
-            stmt.setString(1, world);
-            stmt.setInt(2, x);
-            stmt.setInt(3, y);
-            stmt.setInt(4, z);
+            ps.setString(1, placeholder.getWorld());
+            ps.setInt(2, placeholder.getX());
+            ps.setInt(3, placeholder.getY());
+            ps.setInt(4, placeholder.getZ());
+            ps.setInt(5, placeholder.getChunkX());
+            ps.setInt(6, placeholder.getChunkZ());
+            ps.setString(7, placeholder.getConfig());
+            ps.executeUpdate();
+        }
+    }
 
-            try (ResultSet rs = stmt.executeQuery()) {
+    public List<SpawnerBlockEntity> getByChunk(String world, int chunkX, int chunkZ) {
+        try {
+            List<SpawnerBlockEntity> list = new ArrayList<>();
+
+            try (Connection conn = dataSource.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(sqlQueryLoader.getQuery("get_spawners_by_chunk"))) {
+
+                ps.setString(1, world);
+                ps.setInt(2, chunkX);
+                ps.setInt(3, chunkZ);
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        list.add(mapRow(rs));
+                    }
+                }
+            }
+            return list;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public SpawnerBlockEntity getByLocation(String world, int x, int y, int z) throws SQLException {
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sqlQueryLoader.getQuery("get_spawner_by_location"))) {
+
+            ps.setString(1, world);
+            ps.setInt(2, x);
+            ps.setInt(3, y);
+            ps.setInt(4, z);
+
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return Optional.of(mapRow(rs));
+                    return mapRow(rs);
                 }
             }
         }
-        return Optional.empty();
+        return null;
     }
 
     public void deleteByLocation(String world, int x, int y, int z) throws SQLException {
         try (Connection conn = dataSource.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(getSQL("sql/delete/spawner_block_by_location.sql"))) {
+             PreparedStatement ps = conn.prepareStatement(sqlQueryLoader.getQuery("delete_spawner_by_location"))) {
 
-            stmt.setString(1, world);
-            stmt.setInt(2, x);
-            stmt.setInt(3, y);
-            stmt.setInt(4, z);
-
-            stmt.executeUpdate();
+            ps.setString(1, world);
+            ps.setInt(2, x);
+            ps.setInt(3, y);
+            ps.setInt(4, z);
+            ps.executeUpdate();
         }
     }
 
-    private SpawnerBlock mapRow(ResultSet rs) throws SQLException {
-        throw new UnsupportedOperationException("Ainda preciso implementar o mapRow()");
+    private SpawnerBlockEntity mapRow(ResultSet rs) throws SQLException {
+        return new SpawnerBlockEntity(
+                rs.getString("world"),
+                rs.getInt("x"),
+                rs.getInt("y"),
+                rs.getInt("z"),
+                rs.getInt("chunk_x"),
+                rs.getInt("chunk_z"),
+                rs.getString("config")
+        );
     }
 }

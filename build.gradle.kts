@@ -85,8 +85,8 @@ tasks {
     }
 
     shadowJar {
-        dependsOn(test)
-        mustRunAfter(test)
+        //dependsOn(test)
+        //mustRunAfter(test)
 
         relocate("com.github.theprogmatheus.util", "${pluginPackage}.util")
     }

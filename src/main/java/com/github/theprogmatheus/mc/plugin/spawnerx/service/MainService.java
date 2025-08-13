@@ -23,15 +23,15 @@ public class MainService extends PluginService {
      * Register your services here
      */
     public void setupServices() {
-        addService(ConfigurationService.class, 10, 0);
-        addService(MessageService.class, 9, 0);
-        addService(DatabaseSQLService.class, 8, -8);
-        addService(CommandService.class, 5, 0);
-        addService(ListenerService.class);
-        addService(APIService.class);
-        addService(UpdateCheckerService.class);
-        addService(PlayerProfileService.class);
-        addService(SpawnerXService.class, -10, 10);
+        addService(ConfigurationService.class, 10, 2);
+        addService(MessageService.class, 9, 3);
+        addService(DatabaseSQLService.class, 8, 4);
+        addService(SpawnerXService.class, 8, 10);
+        addService(PlayerProfileService.class, 7, 9);
+        addService(APIService.class, 6, 8);
+        addService(CommandService.class, 5, 7);
+        addService(ListenerService.class, 4, 6);
+        addService(UpdateCheckerService.class, 3, 5);
     }
 
     @Override

@@ -15,6 +15,7 @@ public class BlockLocationKey {
 
     private String world;
     private int x, y, z;
+    private ChunkCoord chunkCoord;
 
 
     public Block getBlock() {
@@ -37,6 +38,12 @@ public class BlockLocationKey {
         if (world == null)
             throw new IllegalArgumentException("The bukkit location world cannot be null to create a new BlockLocationKey");
 
-        return new BlockLocationKey(world.getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        return new BlockLocationKey(
+                world.getName(),
+                location.getBlockX(),
+                location.getBlockY(),
+                location.getBlockZ(),
+                ChunkCoord.fromChunk(location.getChunk())
+        );
     }
 }

@@ -49,7 +49,7 @@ public class SpawnerBlockConfig extends LinkedObject<String> {
         super(id.toLowerCase());
         this.plugin = plugin;
         this.namespacedKey = getNamespacedKey(plugin);
-        this.id = id.toLowerCase();
+        this.id = getOriginal();
         this.mobConfig = mobConfig;
     }
 

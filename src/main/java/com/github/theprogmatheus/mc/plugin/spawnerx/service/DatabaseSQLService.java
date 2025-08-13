@@ -2,6 +2,8 @@ package com.github.theprogmatheus.mc.plugin.spawnerx.service;
 
 import com.github.theprogmatheus.mc.plugin.spawnerx.SpawnerX;
 import com.github.theprogmatheus.mc.plugin.spawnerx.database.DatabaseSQLManager;
+import com.github.theprogmatheus.mc.plugin.spawnerx.database.SqlQueryLoader;
+import com.github.theprogmatheus.mc.plugin.spawnerx.database.repository.SpawnerBlockRepository;
 import com.github.theprogmatheus.mc.plugin.spawnerx.lib.Injector;
 import com.github.theprogmatheus.mc.plugin.spawnerx.lib.PluginService;
 import com.zaxxer.hikari.HikariConfig;
@@ -12,6 +14,7 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 @Singleton
@@ -21,17 +24,28 @@ public class DatabaseSQLService extends PluginService {
     private final SpawnerX plugin;
     private final Injector injector;
     private DatabaseSQLManager databaseManager;
+    private SpawnerBlockRepository spawnerBlockRepository;
 
-
-    /**
-     * Change how to load the database config
-     */
-    private HikariConfig loadDatabaseConfig() {
+    private DatabaseSQLManager loadDatabaseManager() {
         var inTestMode = Boolean.parseBoolean(System.getProperty("BUKKIT_PLUGIN_DB_IN_TEST_MODE", "false"));
-        if (inTestMode)
-            return loadTestDatabaseConfig();
+        if (inTestMode) {
+            SqlQueryLoader queryLoader = new SqlQueryLoader("/sql/sqlite", "spawnerx_", new ConcurrentHashMap<>());
+            return new DatabaseSQLManager(this.injector, loadTestDatabaseConfig(), queryLoader);
+        }
+        return managerForMySQL();
+    }
 
-        return loadSqliteDatabaseConfig();
+    private HikariConfig loadMysqlDatabaseConfig(String hostname, String database, String username, String password) {
+        var config = new HikariConfig();
+
+        config.setMaximumPoolSize(10);
+        config.setMinimumIdle(3);
+        config.setDriverClassName("com.mysql.cj.jdbc.Driver");
+        config.setJdbcUrl("jdbc:mysql://%s/%s".formatted(hostname, database));
+        config.setUsername(username);
+        config.setPassword(password);
+
+        return config;
     }
 
 
@@ -64,11 +78,33 @@ public class DatabaseSQLService extends PluginService {
         return config;
     }
 
+
+    private DatabaseSQLManager managerForSQLite() {
+        HikariConfig config = loadSqliteDatabaseConfig();
+        SqlQueryLoader queryLoader = new SqlQueryLoader("/sql/sqlite", "spawnerx_", new ConcurrentHashMap<>());
+        return new DatabaseSQLManager(this.injector, config, queryLoader);
+    }
+
+    private DatabaseSQLManager managerForMySQL() {
+        HikariConfig config = loadMysqlDatabaseConfig(
+                "localhost",
+                "minecraft",
+                "root",
+                "root"
+        );
+
+        SqlQueryLoader queryLoader = new SqlQueryLoader("/sql/mysql", "spawnerx_", new ConcurrentHashMap<>());
+
+        return new DatabaseSQLManager(this.injector, config, queryLoader);
+    }
+
     @Override
     public void startup() {
-        this.databaseManager = new DatabaseSQLManager(this.injector, loadDatabaseConfig());
+        this.databaseManager = loadDatabaseManager();
         try {
-            this.databaseManager.openConnection();
+            this.databaseManager.init();
+            this.injector.registerSingleton(SpawnerBlockRepository.class, this.spawnerBlockRepository =
+                    new SpawnerBlockRepository(this.databaseManager.getSqlQueryLoader(), this.databaseManager.getDataSource()));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -78,7 +114,7 @@ public class DatabaseSQLService extends PluginService {
     @Override
     public void shutdown() {
         try {
-            this.databaseManager.closeConnection();
+            this.databaseManager.terminate();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

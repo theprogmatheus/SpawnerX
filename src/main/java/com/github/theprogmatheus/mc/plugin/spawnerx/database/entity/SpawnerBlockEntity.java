@@ -12,6 +12,5 @@ public class SpawnerBlockEntity {
     private String world;
     private int x, y, z, chunkX, chunkZ;
     private String config;
-    private int amount;
 
 }

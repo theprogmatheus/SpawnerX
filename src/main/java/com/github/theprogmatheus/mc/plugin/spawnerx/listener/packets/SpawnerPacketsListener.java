@@ -11,6 +11,7 @@ import com.github.retrooper.packetevents.util.Vector3i;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerBlockEntityData;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerChunkData;
 import com.github.theprogmatheus.mc.plugin.spawnerx.domain.BlockLocationKey;
+import com.github.theprogmatheus.mc.plugin.spawnerx.domain.ChunkCoord;
 import com.github.theprogmatheus.mc.plugin.spawnerx.domain.PlayerProfile;
 import com.github.theprogmatheus.mc.plugin.spawnerx.domain.SpawnerBlock;
 import com.github.theprogmatheus.mc.plugin.spawnerx.util.LinkedObject;
@@ -61,8 +62,13 @@ public class SpawnerPacketsListener extends PacketListenerAbstract {
         if (id == null || id.getValue() == null || id.getValue().isBlank())
             return;
 
+
         Vector3i position = packet.getPosition();
-        BlockLocationKey blockLocationKey = new BlockLocationKey(player.getWorld().getName(), position.getX(), position.getY(), position.getZ());
+        String world = player.getWorld().getName();
+        int chunkX = position.getX() >> 4;
+        int chunkZ = position.getZ() >> 4;
+
+        BlockLocationKey blockLocationKey = new BlockLocationKey(world, position.getX(), position.getY(), position.getZ(), new ChunkCoord(world, chunkX, chunkZ));
         LinkedObject.getLink(SpawnerBlock.class, blockLocationKey).ifPresent(spawner -> {
             if (isHideSpawnerAnim(player))
                 event.setCancelled(true);

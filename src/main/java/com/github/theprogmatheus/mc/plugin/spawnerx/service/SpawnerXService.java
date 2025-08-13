@@ -1,8 +1,6 @@
 package com.github.theprogmatheus.mc.plugin.spawnerx.service;
 
 import com.github.theprogmatheus.mc.plugin.spawnerx.SpawnerX;
-import com.github.theprogmatheus.mc.plugin.spawnerx.database.entity.SpawnerBlockEntity;
-import com.github.theprogmatheus.mc.plugin.spawnerx.database.mappers.SpawnerBlockMapper;
 import com.github.theprogmatheus.mc.plugin.spawnerx.database.repository.SpawnerBlockRepository;
 import com.github.theprogmatheus.mc.plugin.spawnerx.domain.*;
 import com.github.theprogmatheus.mc.plugin.spawnerx.lib.Injector;
@@ -10,18 +8,15 @@ import com.github.theprogmatheus.mc.plugin.spawnerx.lib.PluginService;
 import com.github.theprogmatheus.mc.plugin.spawnerx.util.ExecutorTimeLogger;
 import com.github.theprogmatheus.mc.plugin.spawnerx.util.LinkedObject;
 import com.github.theprogmatheus.mc.plugin.spawnerx.util.PacketEventsUtils;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.Bukkit;
-import org.bukkit.scheduler.BukkitTask;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@Getter
 @Singleton
 @RequiredArgsConstructor(onConstructor_ = @Inject)
 public class SpawnerXService extends PluginService {
@@ -32,17 +27,17 @@ public class SpawnerXService extends PluginService {
     private final transient ConfigurationService configurationService;
 
     private SpawnerBlockRepository spawnerBlockRepository;
-    private BukkitTask autoSaveAndPurgeTask;
+    private SpawnerBlockPersist spawnerBlockPersist;
     private File mobDropControllerGlobalFile;
 
     @Override
     public void startup() {
         this.spawnerBlockRepository = this.injector.getInstance(SpawnerBlockRepository.class);
-        this.autoSaveAndPurgeTask = Bukkit.getScheduler().runTaskTimerAsynchronously(this.plugin, this::saveSpawnerBlocks, 20 * 300, 20 * 300);
+        this.spawnerBlockPersist = this.injector.getInstance(SpawnerBlockPersist.class);
 
         MobConfig.loadDefaults(this.plugin);
         SpawnerBlockConfig.loadDefaults(this.plugin);
-        loadSpawnerBlocks();
+        loadGlobalMobDropController();
         MobEntity.loadAllPersisted();
         loadPacketEvents();
     }
@@ -50,12 +45,9 @@ public class SpawnerXService extends PluginService {
 
     @Override
     public void shutdown() {
-        if (this.autoSaveAndPurgeTask != null)
-            this.autoSaveAndPurgeTask.cancel();
-
-        saveSpawnerBlocks();
-        purgeSpawnerBlocks();
+        saveGlobalMobDropController();
         unloadPacketEvents();
+        this.spawnerBlockPersist.shutdown();
     }
 
     public void loadGlobalMobDropController() {
@@ -109,70 +101,4 @@ public class SpawnerXService extends PluginService {
             }));
         });
     }
-
-    public void loadSpawnerBlocks() {
-        ExecutorTimeLogger.executeAndLogTime(this.log, "Load SpawnerBlocks", () -> {
-            try {
-                this.spawnerBlockRepository
-                        .queryForAll()
-                        .stream()
-                        .map(spawnerBlockMapper::mapTo)
-                        .filter(SpawnerBlock::isOk)
-                        .forEach(SpawnerBlock::link);
-            } catch (SQLException e) {
-                log.log(Level.SEVERE, "It was not possible to load the database spawners.", e);
-            }
-        });
-
-        // pegar uma carona aqui por enquanto kk
-        loadGlobalMobDropController();
-    }
-
-    public synchronized void saveSpawnerBlocks() {
-        ExecutorTimeLogger.executeAndLogTime(this.log, "Save SpawnerBlocks", () -> {
-            try {
-                var link = LinkedObject.getLinkerMap(SpawnerBlock.class);
-                if (link.isPresent()) {
-
-                    this.spawnerBlockRepository.callBatchTasks(() -> {
-                        for (var spawner : link.get().values()) {
-                            var spawnerEntity = spawnerBlockMapper.mapFrom(spawner);
-
-
-                            List<SpawnerBlockEntity> existsList = this.spawnerBlockRepository.queryForEq("location", spawner.getOriginal());
-                            if (!existsList.isEmpty())
-                                spawnerEntity.setId(existsList.get(0).getId());
-
-                            var result = this.spawnerBlockRepository.createOrUpdate(spawnerEntity);
-                            if (result.isCreated())
-                                spawner.setDbId(spawnerEntity.getId());
-                        }
-                        return null;
-                    });
-                }
-            } catch (Exception e) {
-                log.log(Level.SEVERE, "An error occurred when trying to save the spawners in the database.", e);
-            }
-        });
-        // pegar uma carona aqui por enquanto kk
-        saveGlobalMobDropController();
-    }
-
-    public void purgeSpawnerBlocks() {
-        ExecutorTimeLogger.executeAndLogTime(this.log, "Purge SpawnerBlocks", () -> {
-            try {
-                var toDelete = this.spawnerBlockRepository
-                        .queryForAll()
-                        .stream()
-                        .map(spawnerBlockMapper::mapTo)
-                        .filter(SpawnerBlock::isBroken)
-                        .map(spawnerBlockMapper::mapFrom)
-                        .toList();
-                this.spawnerBlockRepository.delete(toDelete);
-            } catch (Exception e) {
-                log.log(Level.SEVERE, "An error occurred when trying to clean the database of broken spawners", e);
-            }
-        });
-    }
-
 }

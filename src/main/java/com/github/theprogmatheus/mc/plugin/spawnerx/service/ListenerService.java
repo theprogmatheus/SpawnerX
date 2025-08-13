@@ -10,6 +10,7 @@ import com.github.theprogmatheus.mc.plugin.spawnerx.listener.mobs.MobSpawnListen
 import com.github.theprogmatheus.mc.plugin.spawnerx.listener.player.PlayerJoinListener;
 import com.github.theprogmatheus.mc.plugin.spawnerx.listener.spawners.SpawnerBlockBreakListener;
 import com.github.theprogmatheus.mc.plugin.spawnerx.listener.spawners.SpawnerBlockInteractListener;
+import com.github.theprogmatheus.mc.plugin.spawnerx.listener.spawners.SpawnerBlockLoadListener;
 import com.github.theprogmatheus.mc.plugin.spawnerx.listener.spawners.SpawnerBlockPlaceListener;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
@@ -34,6 +35,7 @@ public class ListenerService extends PluginService {
      */
     private void registerAllListeners() {
         registerListener(PlayerJoinLangConfig.class);
+        registerListener(SpawnerBlockLoadListener.class);
         registerListener(SpawnerBlockPlaceListener.class);
         registerListener(SpawnerBlockBreakListener.class);
         registerListener(SpawnerBlockInteractListener.class);

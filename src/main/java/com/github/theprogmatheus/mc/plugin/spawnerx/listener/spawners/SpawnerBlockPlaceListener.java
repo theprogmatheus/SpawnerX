@@ -4,6 +4,7 @@ import com.github.theprogmatheus.mc.plugin.spawnerx.SpawnerX;
 import com.github.theprogmatheus.mc.plugin.spawnerx.domain.BlockLocationKey;
 import com.github.theprogmatheus.mc.plugin.spawnerx.domain.SpawnerBlock;
 import com.github.theprogmatheus.mc.plugin.spawnerx.domain.SpawnerBlockConfig;
+import com.github.theprogmatheus.mc.plugin.spawnerx.domain.SpawnerBlockPersist;
 import com.github.theprogmatheus.mc.plugin.spawnerx.util.LinkedObject;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.event.EventHandler;
@@ -18,6 +19,7 @@ import javax.inject.Inject;
 public class SpawnerBlockPlaceListener implements Listener {
 
     private final transient SpawnerX plugin;
+    private final transient SpawnerBlockPersist spawnerBlockPersist;
 
     @EventHandler(priority = EventPriority.MONITOR)
     void onBlockPlace(BlockPlaceEvent event) {
@@ -29,7 +31,7 @@ public class SpawnerBlockPlaceListener implements Listener {
         if (!SpawnerBlock.isValidBukkitSpawnerBlock(block))
             return;
 
-        var spawnerConfigId = SpawnerBlockConfig.getSpawnerBlockConfigId(plugin, event.getItemInHand());
+        var spawnerConfigId = SpawnerBlockConfig.getSpawnerBlockConfigId(this.plugin, event.getItemInHand());
         if (spawnerConfigId == null)
             return;
 
@@ -42,7 +44,10 @@ public class SpawnerBlockPlaceListener implements Listener {
         LinkedObject.getLink(SpawnerBlock.class, BlockLocationKey.fromBukkitLocation(block.getLocation()))
                 .ifPresent(LinkedObject::unlink);
 
-        new SpawnerBlock(block, spawnerConfigLink.get()).link();
+        SpawnerBlock spawner = new SpawnerBlock(block, spawnerConfigLink.get());
+        spawner.link();
+
+        this.spawnerBlockPersist.put(spawner);
     }
 
 }

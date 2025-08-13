@@ -14,14 +14,15 @@ public class DatabaseSQLManager {
 
     private final Injector injector;
     private final HikariConfig databaseConfig;
+    private final SqlQueryLoader sqlQueryLoader;
 
     private HikariDataSource dataSource;
 
-    public void openConnection() throws SQLException {
+    public void init() throws SQLException {
         this.dataSource = new HikariDataSource(this.databaseConfig);
     }
 
-    public void closeConnection() throws Exception {
+    public void terminate() throws Exception {
         this.dataSource.close();
     }
 

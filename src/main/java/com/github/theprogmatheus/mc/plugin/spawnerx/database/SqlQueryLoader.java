@@ -1,20 +1,22 @@
 package com.github.theprogmatheus.mc.plugin.spawnerx.database;
 
+import lombok.Data;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 
+@Data
 public class SqlQueryLoader {
 
+    private final String path;
     private final String tablePrefix;
     private final Map<String, String> cachedQueries;
-
-    public SqlQueryLoader(String tablePrefix) {
-        this.tablePrefix = tablePrefix;
-        this.cachedQueries = new HashMap<>();
-    }
 
     public List<String> getQueries(String queryPath) {
         String query = getQuery(queryPath);
@@ -32,7 +34,7 @@ public class SqlQueryLoader {
     }
 
     private String loadQuery(String queryPath) {
-        InputStream resource = getClass().getResourceAsStream("/sql/%s.sql".formatted(queryPath));
+        InputStream resource = getClass().getResourceAsStream("%s/%s.sql".formatted(this.path, queryPath));
         if (resource == null)
             throw new IllegalArgumentException("The query '%s' not found.".formatted(queryPath));
 
@@ -43,18 +45,8 @@ public class SqlQueryLoader {
                 stringBuilder.append(scanner.nextLine()).append(System.lineSeparator());
             }
         }
-
         return stringBuilder.toString()
                 .replace("%table_prefix%", this.tablePrefix)
                 .trim();
-    }
-
-
-    public String getTablePrefix() {
-        return tablePrefix;
-    }
-
-    public Map<String, String> getCachedQueries() {
-        return cachedQueries;
     }
 }
