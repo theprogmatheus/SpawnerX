@@ -12,6 +12,27 @@ lang:
   # (baseado nas configurações de idioma do Minecraft).
   individual: true
 
+# =====================[ CONFIGURAÇÕES DO BANCO DE DADOS ]===================== #
+database:
+
+  # Define o tipo de banco de dados que será usado. (SQLite, MySQL ou MariaDB)
+  type: "SQLite"
+
+  # Define o prefix usado nos nomes das tabelas no banco.
+  prefix: "spawnerx_"
+
+  # Define o endereço do banco de dados. (SQLite não precisa disso.)
+  host: "localhost"
+
+  # Define o nome do banco de dados. (SQLite não precisa disso.)
+  dbname: "minecraft"
+
+  # Define o nome de usuário do banco de dados. (SQLite não precisa disso.)
+  user: "yourUsername"
+
+  # Define a senha do banco de dados. (SQLite não precisa disso.)
+  pass: "yourPassword"
+
 # =====================[ CONFIGURAÇÕES DE SPAWNERS ]===================== #
 spawners:
   item:
