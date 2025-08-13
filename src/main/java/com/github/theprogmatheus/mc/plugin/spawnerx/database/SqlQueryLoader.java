@@ -45,8 +45,14 @@ public class SqlQueryLoader {
                 stringBuilder.append(scanner.nextLine()).append(System.lineSeparator());
             }
         }
-        return stringBuilder.toString()
+
+        var result = stringBuilder.toString()
                 .replace("%table_prefix%", this.tablePrefix)
                 .trim();
+
+        if (result.isBlank())
+            throw new IllegalStateException("The query for address %s is null or empty.".formatted(queryPath));
+
+        return result;
     }
 }

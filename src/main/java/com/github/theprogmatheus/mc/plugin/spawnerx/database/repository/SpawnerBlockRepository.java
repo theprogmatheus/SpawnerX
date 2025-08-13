@@ -50,7 +50,7 @@ public class SpawnerBlockRepository {
             List<SpawnerBlockEntity> list = new ArrayList<>();
 
             try (Connection conn = dataSource.getConnection();
-                 PreparedStatement ps = conn.prepareStatement(sqlQueryLoader.getQuery("get_spawners_by_chunk"))) {
+                 PreparedStatement ps = conn.prepareStatement(sqlQueryLoader.getQuery("get_spawner_by_chunk"))) {
 
                 ps.setString(1, world);
                 ps.setInt(2, chunkX);
